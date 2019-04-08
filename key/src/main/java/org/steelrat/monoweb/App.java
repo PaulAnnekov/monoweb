@@ -8,15 +8,13 @@ public class App {
         String pin = args[0];
         String accessToken = args[1];
         String encKey = args[2];
-        
+
         byte[] encKeyBytes = Base64.getDecoder().decode(encKey);
         byte[] pinBytes;
         if (MonoSignature.checkEncKeyLength(encKeyBytes)) {
             pinBytes = "DEFAULT".getBytes(StandardCharsets.UTF_8);
         } else {
-            // if (pin != null) {
-                pinBytes = pin.getBytes(StandardCharsets.UTF_8);
-            // }
+            pinBytes = pin.getBytes(StandardCharsets.UTF_8);
         }
         MonoSignature signature = MonoSignature.createSignature(encKeyBytes, pinBytes);
 

@@ -94,7 +94,7 @@ public class MonoSignature {
         try {
             sha256.initSign(this.privateKey);
             sha256.update(bArr);
-            return m18903c(this.sha256.sign());
+            return m18903c(sha256.sign());
         } catch (InvalidKeyException e) {
             throw new GenericException("Error init sign " + e);
         } catch (SignatureException e) {
