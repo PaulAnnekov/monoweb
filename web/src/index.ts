@@ -94,7 +94,6 @@ function checkEncKeyLength(key: CryptoJS.LibWordArray): boolean {
 }
 
 function gen(encKeyBase64: string, pin: string, accessToken: string) {
-    debugger;
     const encKey = CryptoJS.enc.Base64.parse(encKeyBase64);
     if (checkEncKeyLength(encKey)) {
         pin = "DEFAULT";
@@ -109,6 +108,83 @@ function gen(encKeyBase64: string, pin: string, accessToken: string) {
     return res;
 }
 
-let params = (new URL(document.location.toString())).searchParams;
-const signature = gen(params.get('enc_key'), params.get('pin'), params.get('access_token'));
-console.log('signature', signature);
+async function api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
+    headers['Device-Id'] = '';
+    headers['Device-Name'] = '';
+    headers['App-Version'] = '';
+    headers['Lang'] = '';
+
+    const params: RequestInit = {
+        method: body ? 'POST' : 'GET',
+        headers: new Headers(headers),
+        body: null,
+    };
+    if (body) {
+        params.body = JSON.stringify(body);
+    }
+    const res = await fetch('https://cors-anywhere.herokuapp.com/' + url, params);
+    return await res.json();
+}
+
+async function load() {
+    debugger;
+    const Fingerprint = '';
+    const phone = await new Promise(function(resolve) {
+        const phoneEl = document.querySelector('#phone') as HTMLInputElement;
+        phoneEl.addEventListener('keydown', (event: KeyboardEvent)=>{
+            if (event.keyCode != 13)
+                return;
+            resolve(phoneEl.value);
+        });
+    });
+    debugger;
+    await api('https://pki-auth.monobank.com.ua/otp', {Fingerprint}, {
+        'channel': 'sms',
+        'phone': phone,
+    });
+    debugger;
+    const code = await new Promise(function(resolve) {
+        const smsEl = document.querySelector('#sms') as HTMLInputElement;
+        smsEl.addEventListener('input', ()=>{
+            if (smsEl.value.length != 4)
+                return;
+            resolve(smsEl.value);
+        });
+    });
+    debugger;
+    const tokens = await api('https://pki-auth.monobank.com.ua/token', {Fingerprint}, {
+        'channel': 'sms',
+        'grant_type': 'password',
+        'password': code,
+        'username': phone,
+    });
+    debugger;
+    const keys = await api('https://pki-auth.monobank.com.ua/keys', {
+        Authorization: `Bearer ${tokens['access_token']}`,
+        Fingerprint,
+    });
+    debugger;
+    const pinEl = document.querySelector('#pin') as HTMLInputElement;
+    const sign = gen(keys.keys[0].enc_key, pinEl.value, tokens.access_token)
+    const newTokens = await api('https://pki-auth.monobank.com.ua/auth', {
+        Authorization: `Bearer ${tokens.access_token}`,
+        Fingerprint,
+    }, {
+        auth: [{
+            name: keys.keys[0].name,
+            sign,
+        }]
+    });
+    debugger;
+    const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
+        Authorization: `Bearer ${newTokens.access_token}`,
+    });
+    debugger;
+    console.log('overall', overall);
+}
+
+load();
+
+// let params = (new URL(document.location.toString())).searchParams;
+// const signature = gen(params.get('enc_key'), params.get('pin'), params.get('access_token'));
+// console.log('signature', signature);
