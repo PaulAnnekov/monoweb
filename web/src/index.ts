@@ -58,13 +58,13 @@ function sign(key: elliptic.ec.KeyPair, data: string): elliptic.ec.Signature {
 // Encodes signature according to monobank rules.
 function transformSignature(signature: elliptic.ec.Signature): string {
     function trim32(arr: number[]): Int8Array {
-        const rLength = r.length - 32;
+        const length = arr.length - 32;
         let trimmed: Int8Array;
-        if (rLength < 0) {
+        if (length < 0) {
             trimmed = new Int8Array(32)
-            trimmed.set(r, -rLength)
+            trimmed.set(arr, -length)
         } else {
-            trimmed = new Int8Array(r).subarray(rLength)
+            trimmed = new Int8Array(arr).subarray(length)
         }
         return trimmed;
     }
