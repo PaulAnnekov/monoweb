@@ -1,6 +1,10 @@
 import * as elliptic from 'elliptic';
 import * as CryptoJS from 'crypto-js';
 
+const PLATFORM = 'android';
+const APP_VERSION_NAME = '1.21.4';
+const APP_VERSION_CODE = '1012';
+
 // Generates key from enc_key and pin.
 function getKey(pin: string, data: CryptoJS.WordArray): string {
     // https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js or only parts.
@@ -71,14 +75,14 @@ function transformSignature(signature: elliptic.ec.Signature): string {
 
     const r = signature.r.toArray();
     const s = signature.s.toArray();
-    
+
     let rPart = trim32(r);
     let sPart = trim32(s);
 
     let res = new Uint8Array(64);
     res.set(rPart);
     res.set(sPart, 32);
-    
+
     return btoa(String.fromCharCode.apply(null, res));
 }
 
@@ -108,11 +112,38 @@ function gen(encKeyBase64: string, pin: string, accessToken: string) {
     return res;
 }
 
+function getDeviceID(): string {
+    if (!localStorage.getItem('deviceID')) {
+        // Instead ANDROID_ID (64 bit in hex) + WiFi MAC (XX:XX:XX:XX:XX:XX).
+        const id = CryptoJS.lib.WordArray.random(8).toString()
+        // https://stackoverflow.com/a/24621956/782599
+        const mac = "XX:XX:XX:XX:XX:XX".replace(/X/g, function() {
+            return "0123456789ABCDEF".charAt(Math.floor(Math.random() * 16))
+        });
+        let sha1 = CryptoJS.SHA1(id + mac);
+        localStorage.setItem('deviceID', sha1.toString().toUpperCase());
+    }
+    
+    return localStorage.getItem('deviceID');
+}
+
+function getDeviceName(): string {
+    // TODO: Try to use browser vendor + name instead.
+    const device = 'Huawei P30Pro';
+    const androidVersion = '9(28)';
+    return `${device}, ${androidVersion}, ${APP_VERSION_NAME}(${APP_VERSION_CODE})`;
+}
+
+function getAppVersion(): string {
+    return `${PLATFORM}-${APP_VERSION_CODE}`
+}
+
 async function api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
-    headers['Device-Id'] = '';
-    headers['Device-Name'] = '';
-    headers['App-Version'] = '';
-    headers['Lang'] = '';
+    headers['Device-Id'] = getDeviceID();
+    headers['Device-Name'] = getDeviceName();
+    headers['App-Version'] = getAppVersion();
+    // TODO: Detect language.
+    headers['Lang'] = 'uk';
 
     const params: RequestInit = {
         method: body ? 'POST' : 'GET',
@@ -126,9 +157,12 @@ async function api(url: string, headers: { [key: string]: string } = {}, body?: 
     return await res.json();
 }
 
+function getFingerprint() {
+    // TODO: Generate it.
+    return 'YrSHHI/+J1gJQEurRDlhAiaLKKQ8SWiw34Trahgjkk9R4JHImoZNjz6Tfw9XrqrS11q676FN09O7AGyeIsVWEeHQQREP7qhzoXakFl8/QN9UwppZsLO1QqAuSUEquLh+VcttnjqKaHlLbnKMuhMvSTaWPLduZ7lvCaE31025rWni8LbTy2SFg1SVbVKgU05gwlvJX641f4Fypk0ttEYHl44b4JBeo99mzaT4cb3vcNQMX/zxzcAW8Pwaz2NjY1s+Yn40gFDyu/EtpdmZym08Xu+US2JmPXVUaOKxy5mF36cAx6fQOO8iOC/Qx/LliNAt7+zz6bkZZ34nmsu/qqvx0qfD5z953XDpxUIZFZlhSe8FcXokO+CIxppPSwIjoinc4Mc1Ojy4Ae+0+vEDjir75c2/Rn9Za87AG4bFnr1MVdUPhKiQ4Cz9OnBvlkxp4haQmGJBwSIENh5CQOUHT0aeS92eGwRDZBSP4HjP9X+isqzi34QgkM4+cLVfMnWO9VUp20kvNVIYhV3mLzarttVMbLY4JDpGq/qtQCv+EspU3ME57BrgV6NexYLChQXlWHrz6fenQTGTYvneLy9HClo7PxInANP+iB6WyxX8ZQ6O8EAo2kx0pk8=';
+}
+
 async function load() {
-    debugger;
-    const Fingerprint = '';
     const phone = await new Promise(function(resolve) {
         const phoneEl = document.querySelector('#phone') as HTMLInputElement;
         phoneEl.addEventListener('keydown', (event: KeyboardEvent)=>{
@@ -137,12 +171,12 @@ async function load() {
             resolve(phoneEl.value);
         });
     });
-    debugger;
-    await api('https://pki-auth.monobank.com.ua/otp', {Fingerprint}, {
+    await api('https://pki-auth.monobank.com.ua/otp', {
+        Fingerprint: getFingerprint()
+    }, {
         'channel': 'sms',
         'phone': phone,
     });
-    debugger;
     const code = await new Promise(function(resolve) {
         const smsEl = document.querySelector('#sms') as HTMLInputElement;
         smsEl.addEventListener('input', ()=>{
@@ -151,35 +185,32 @@ async function load() {
             resolve(smsEl.value);
         });
     });
-    debugger;
-    const tokens = await api('https://pki-auth.monobank.com.ua/token', {Fingerprint}, {
+    const tokens = await api('https://pki-auth.monobank.com.ua/token', {
+        Fingerprint: getFingerprint()
+    }, {
         'channel': 'sms',
         'grant_type': 'password',
         'password': code,
         'username': phone,
     });
-    debugger;
     const keys = await api('https://pki-auth.monobank.com.ua/keys', {
         Authorization: `Bearer ${tokens['access_token']}`,
-        Fingerprint,
+        Fingerprint: getFingerprint(),
     });
-    debugger;
     const pinEl = document.querySelector('#pin') as HTMLInputElement;
     const sign = gen(keys.keys[0].enc_key, pinEl.value, tokens.access_token)
     const newTokens = await api('https://pki-auth.monobank.com.ua/auth', {
         Authorization: `Bearer ${tokens.access_token}`,
-        Fingerprint,
+        Fingerprint: getFingerprint(),
     }, {
         auth: [{
             name: keys.keys[0].name,
             sign,
         }]
     });
-    debugger;
     const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
         Authorization: `Bearer ${newTokens.access_token}`,
     });
-    debugger;
     console.log('overall', overall);
 }
 
