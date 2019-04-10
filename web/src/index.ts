@@ -228,6 +228,7 @@ async function load() {
         pinEl.addEventListener('input', onInput);
         onInput();
     }) as string;
+    toggleStep('info');
     const sign = gen(keys.keys[0].enc_key, pin, tokens.access_token)
     const newTokens = await api('https://pki-auth.monobank.com.ua/auth', {
         Authorization: `Bearer ${tokens.access_token}`,
@@ -241,7 +242,6 @@ async function load() {
     const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
         Authorization: `Bearer ${newTokens.access_token}`,
     });
-    toggleStep('info');
     const nameEl = document.querySelector('#info .name') as HTMLElement;
     const emailEl = document.querySelector('#info .email') as HTMLElement;
     const photoEl = document.querySelector('#info .photo img') as HTMLImageElement;
