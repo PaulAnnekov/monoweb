@@ -158,8 +158,10 @@ async function api(url: string, headers: { [key: string]: string } = {}, body?: 
 }
 
 function getFingerprint() {
-    // TODO: Generate it.
-    return 'YrSHHI/+J1gJQEurRDlhAiaLKKQ8SWiw34Trahgjkk9R4JHImoZNjz6Tfw9XrqrS11q676FN09O7AGyeIsVWEeHQQREP7qhzoXakFl8/QN9UwppZsLO1QqAuSUEquLh+VcttnjqKaHlLbnKMuhMvSTaWPLduZ7lvCaE31025rWni8LbTy2SFg1SVbVKgU05gwlvJX641f4Fypk0ttEYHl44b4JBeo99mzaT4cb3vcNQMX/zxzcAW8Pwaz2NjY1s+Yn40gFDyu/EtpdmZym08Xu+US2JmPXVUaOKxy5mF36cAx6fQOO8iOC/Qx/LliNAt7+zz6bkZZ34nmsu/qqvx0qfD5z953XDpxUIZFZlhSe8FcXokO+CIxppPSwIjoinc4Mc1Ojy4Ae+0+vEDjir75c2/Rn9Za87AG4bFnr1MVdUPhKiQ4Cz9OnBvlkxp4haQmGJBwSIENh5CQOUHT0aeS92eGwRDZBSP4HjP9X+isqzi34QgkM4+cLVfMnWO9VUp20kvNVIYhV3mLzarttVMbLY4JDpGq/qtQCv+EspU3ME57BrgV6NexYLChQXlWHrz6fenQTGTYvneLy9HClo7PxInANP+iB6WyxX8ZQ6O8EAo2kx0pk8=';
+    // TODO: Generate real fingerprint, not total random.
+    const length = Math.floor(Math.random() * (500 - 400)) + 400;
+    // @ts-ignore
+    return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Base64);
 }
 
 async function load() {
