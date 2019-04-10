@@ -164,7 +164,15 @@ function getFingerprint() {
     return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Base64);
 }
 
+function toggleStep(stepID: string) {
+    ['phone', 'sms', 'pin', 'info'].forEach((id) => {
+        (document.querySelector(`#${id}`) as HTMLElement).style.display = 'none';
+    });
+    (document.querySelector(`#${stepID}`) as HTMLElement).style.display = 'block';
+}
+
 async function load() {
+    toggleStep('phone');
     const phone = await new Promise(function(resolve) {
         const phoneEl = document.querySelector('#phone') as HTMLInputElement;
         phoneEl.addEventListener('keydown', (event: KeyboardEvent)=>{
@@ -173,6 +181,7 @@ async function load() {
             resolve(phoneEl.value);
         });
     });
+    toggleStep('sms');
     await api('https://pki-auth.monobank.com.ua/otp', {
         Fingerprint: getFingerprint()
     }, {
@@ -180,13 +189,16 @@ async function load() {
         'phone': phone,
     });
     const code = await new Promise(function(resolve) {
-        const smsEl = document.querySelector('#sms') as HTMLInputElement;
-        smsEl.addEventListener('input', ()=>{
+        function onInput() {
             if (smsEl.value.length != 4)
                 return;
             resolve(smsEl.value);
-        });
+        }
+        const smsEl = document.querySelector('#sms') as HTMLInputElement;
+        smsEl.addEventListener('input', onInput);
+        onInput();
     });
+    toggleStep('pin');
     const tokens = await api('https://pki-auth.monobank.com.ua/token', {
         Fingerprint: getFingerprint()
     }, {
@@ -199,8 +211,17 @@ async function load() {
         Authorization: `Bearer ${tokens['access_token']}`,
         Fingerprint: getFingerprint(),
     });
-    const pinEl = document.querySelector('#pin') as HTMLInputElement;
-    const sign = gen(keys.keys[0].enc_key, pinEl.value, tokens.access_token)
+    const pin = await new Promise(function(resolve) {
+        function onInput() {
+            if (pinEl.value.length != 4)
+                return;
+            resolve(pinEl.value);
+        }
+        const pinEl = document.querySelector('#pin') as HTMLInputElement;
+        pinEl.addEventListener('input', onInput);
+        onInput();
+    }) as string;
+    const sign = gen(keys.keys[0].enc_key, pin, tokens.access_token)
     const newTokens = await api('https://pki-auth.monobank.com.ua/auth', {
         Authorization: `Bearer ${tokens.access_token}`,
         Fingerprint: getFingerprint(),
@@ -213,6 +234,13 @@ async function load() {
     const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
         Authorization: `Bearer ${newTokens.access_token}`,
     });
+    toggleStep('info');
+    const nameEl = document.querySelector('#info .name') as HTMLElement;
+    const emailEl = document.querySelector('#info .email') as HTMLElement;
+    const photoEl = document.querySelector('#info .photo img') as HTMLImageElement;
+    nameEl.innerText = overall.result.personalData.fullNameRu;
+    emailEl.innerText = overall.result.personalData.email.toLowerCase();
+    photoEl.src = overall.result.personalData.photoAbsoluteUrl;
     console.log('overall', overall);
 }
 
