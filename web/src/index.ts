@@ -138,7 +138,12 @@ function getAppVersion(): string {
     return `${PLATFORM}-${APP_VERSION_CODE}`
 }
 
+function toggleLoader(toggle: boolean) {
+    (document.querySelector(`#loader`) as HTMLElement).style.display = toggle ? 'block' : 'none';
+}
+
 async function api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
+    toggleLoader(true);
     headers['Device-Id'] = getDeviceID();
     headers['Device-Name'] = getDeviceName();
     headers['App-Version'] = getAppVersion();
@@ -154,7 +159,9 @@ async function api(url: string, headers: { [key: string]: string } = {}, body?: 
         params.body = JSON.stringify(body);
     }
     const res = await fetch('https://cors-anywhere.herokuapp.com/' + url, params);
-    return await res.json();
+    const json = await res.json();
+    toggleLoader(false);
+    return json;
 }
 
 function getFingerprint() {
