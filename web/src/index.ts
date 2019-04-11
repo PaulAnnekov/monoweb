@@ -1,9 +1,56 @@
 import * as elliptic from 'elliptic';
 import * as CryptoJS from 'crypto-js';
+import 'reflect-metadata'; // required by 'class-transformer'
+import { serialize, deserialize, Type } from 'class-transformer';
 
 const PLATFORM = 'android';
 const APP_VERSION_NAME = '1.21.4';
 const APP_VERSION_CODE = '1012';
+
+let token;
+
+interface IApiToken {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+    name?: string;
+}
+
+interface IGrantTypePassword {
+    channel: string;
+    grant_type: string,
+    password: string,
+    username: string,
+}
+
+interface IGrantTypeRefreshToken {
+    grant_type: string,
+    refresh_token: string,
+}
+
+class Token {
+    @Type(() => Date)
+    date: Date;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    // Only exists for full privileged token.
+    name?: string;
+
+    isExpired(): boolean {
+        return (Date.now() - this.date.getTime()) / 1000 >= this.expiresIn;
+    }
+
+    static fromAPI(data: IApiToken): Token {
+        const t = new Token();
+        t.date = new Date();
+        t.accessToken = data.access_token;
+        t.refreshToken = data.refresh_token;
+        t.expiresIn = data.expires_in;
+        t.name = data.name;
+        return t;
+    }
+}
 
 // Generates key from enc_key and pin.
 function getKey(pin: string, data: CryptoJS.WordArray): string {
@@ -178,7 +225,51 @@ function toggleStep(stepID: string) {
     (document.querySelector(`#${stepID}`) as HTMLElement).style.display = 'block';
 }
 
-async function load() {
+function saveToken(token: Token) {
+    localStorage.setItem('token', serialize(token));
+}
+
+function getToken(): Token {
+    const data = localStorage.getItem('token');
+    if (!data)
+        return;
+    return deserialize(Token, data);
+}
+
+async function tokenStep(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<Token> {
+    toggleStep('pin');
+    // TODO: We will receive error if user logged in on another device.
+    const token: IApiToken = await api('https://pki-auth.monobank.com.ua/token', {
+        Fingerprint: getFingerprint()
+    }, grant);
+    const keys = await api('https://pki-auth.monobank.com.ua/keys', {
+        Authorization: `Bearer ${token.access_token}`,
+        Fingerprint: getFingerprint(),
+    });
+    const pin = await new Promise(function(resolve) {
+        function onInput() {
+            if (pinEl.value.length != 4)
+                return;
+            resolve(pinEl.value);
+        }
+        const pinEl = document.querySelector('#pin') as HTMLInputElement;
+        pinEl.addEventListener('input', onInput);
+        onInput();
+    }) as string;
+    const sign = gen(keys.keys[0].enc_key, pin, token.access_token)
+    const newToken: IApiToken = await api('https://pki-auth.monobank.com.ua/auth', {
+        Authorization: `Bearer ${token.access_token}`,
+        Fingerprint: getFingerprint(),
+    }, {
+        auth: [{
+            name: keys.keys[0].name,
+            sign,
+        }]
+    });
+    return Token.fromAPI(newToken);
+}
+
+async function auth(): Promise<Token> {
     toggleStep('phone');
     const phone = await new Promise(function(resolve) {
         const phoneEl = document.querySelector('#phone') as HTMLInputElement;
@@ -187,7 +278,7 @@ async function load() {
                 return;
             resolve(phoneEl.value);
         });
-    });
+    }) as string;
     toggleStep('sms');
     await api('https://pki-auth.monobank.com.ua/otp', {
         Fingerprint: getFingerprint()
@@ -204,43 +295,32 @@ async function load() {
         const smsEl = document.querySelector('#sms') as HTMLInputElement;
         smsEl.addEventListener('input', onInput);
         onInput();
-    });
-    toggleStep('pin');
-    const tokens = await api('https://pki-auth.monobank.com.ua/token', {
-        Fingerprint: getFingerprint()
-    }, {
-        'channel': 'sms',
-        'grant_type': 'password',
-        'password': code,
-        'username': phone,
-    });
-    const keys = await api('https://pki-auth.monobank.com.ua/keys', {
-        Authorization: `Bearer ${tokens['access_token']}`,
-        Fingerprint: getFingerprint(),
-    });
-    const pin = await new Promise(function(resolve) {
-        function onInput() {
-            if (pinEl.value.length != 4)
-                return;
-            resolve(pinEl.value);
-        }
-        const pinEl = document.querySelector('#pin') as HTMLInputElement;
-        pinEl.addEventListener('input', onInput);
-        onInput();
     }) as string;
-    toggleStep('info');
-    const sign = gen(keys.keys[0].enc_key, pin, tokens.access_token)
-    const newTokens = await api('https://pki-auth.monobank.com.ua/auth', {
-        Authorization: `Bearer ${tokens.access_token}`,
-        Fingerprint: getFingerprint(),
-    }, {
-        auth: [{
-            name: keys.keys[0].name,
-            sign,
-        }]
+    return tokenStep({
+        channel: 'sms',
+        grant_type: 'password',
+        password: code,
+        username: phone,
     });
+}
+
+async function main() {
+    token = getToken();
+    if (token) {
+        if (token.isExpired()) {
+            token = await tokenStep({
+                grant_type: 'refresh_token',
+                refresh_token: token.refreshToken,
+            });
+            saveToken(token);
+        }
+    } else {
+        token = await auth();
+        saveToken(token);
+    }
+    toggleStep('info');
     const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
-        Authorization: `Bearer ${newTokens.access_token}`,
+        Authorization: `Bearer ${token.accessToken}`,
     });
     const nameEl = document.querySelector('#info .name') as HTMLElement;
     const emailEl = document.querySelector('#info .email') as HTMLElement;
@@ -251,7 +331,7 @@ async function load() {
     console.log('overall', overall);
 }
 
-load();
+main();
 
 // let params = (new URL(document.location.toString())).searchParams;
 // const signature = gen(params.get('enc_key'), params.get('pin'), params.get('access_token'));
