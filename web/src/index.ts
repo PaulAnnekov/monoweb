@@ -6,8 +6,13 @@ import { serialize, deserialize, Type } from 'class-transformer';
 const PLATFORM = 'android';
 const APP_VERSION_NAME = '1.21.4';
 const APP_VERSION_CODE = '1012';
+const CURRENCIES: { [index: string]: string } = {
+    '980': '₴',
+    '840': '$',
+    '978': '€',
+}
 
-let token;
+let token: Token;
 
 interface IApiToken {
     access_token: string;
@@ -189,13 +194,22 @@ function toggleLoader(toggle: boolean) {
     (document.querySelector(`#loader`) as HTMLElement).style.display = toggle ? 'block' : 'none';
 }
 
+function getLanguage(): string {
+    const valid = ['en', 'ru', 'uk'];
+    let lang: string;
+    if (navigator.language) {
+        lang = navigator.language.split('-')[0];
+    }
+
+    return lang && valid.includes(lang) ? lang : 'uk';
+}
+
 async function api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
     toggleLoader(true);
     headers['Device-Id'] = getDeviceID();
     headers['Device-Name'] = getDeviceName();
     headers['App-Version'] = getAppVersion();
-    // TODO: Detect language.
-    headers['Lang'] = 'uk';
+    headers['Lang'] = getLanguage();
 
     const params: RequestInit = {
         method: body ? 'POST' : 'GET',
@@ -275,6 +289,71 @@ async function tokenStep(grant: IGrantTypePassword | IGrantTypeRefreshToken): Pr
     return Token.fromAPI(newToken);
 }
 
+function numberFormat(number: number) {
+    var formatter = new Intl.NumberFormat(getLanguage(), {maximumFractionDigits: 2, minimumFractionDigits: 2});
+    return formatter.format(number);
+}
+
+function isSameDay(d1: Date, d2: Date): boolean {
+    return d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate();
+}
+
+async function displayInfo() {
+    const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
+        Authorization: `Bearer ${token.accessToken}`,
+    });
+    console.log('overall', overall);
+    const card = overall.result.cards[0];
+    const personalData = overall.result.personalData;
+    const nameEl = document.querySelector('#info .name');
+    const photoEl = document.querySelector('#info .photo') as HTMLImageElement;
+    const balanceEl = document.querySelector('#info .card-info .balance');
+    const cardEl = document.querySelector('#info .card-info .card');
+    nameEl.textContent = personalData.fullNameUk;
+    photoEl.src = personalData.photoAbsoluteUrl;
+    balanceEl.textContent = `${numberFormat(card.balance.balance)} ${CURRENCIES[card.balance.ccy]}`;
+    cardEl.textContent = `*${card.cardNum.slice(-4)}`;
+    const statement = await api(`https://mob-gateway.monobank.com.ua/api/card/${card.uid}/statement?limit=50&v2=false`, {
+        Authorization: `Bearer ${token.accessToken}`,
+    });
+    console.log('statement', statement);
+    const operationTemplate = document.querySelector('.operation-template') as HTMLTemplateElement;
+    const dateTemplate = document.querySelector('.date-template') as HTMLTemplateElement;
+    const list = document.querySelector('.statement .list');
+    let lastDate: Date;
+    statement.panStatement.listStmt.forEach((o: any)=>{
+        if (o.type != 'FINANCIAL')
+            return;
+        const transactionDate = new Date(o.tranDate);
+        if (!lastDate || !isSameDay(transactionDate, lastDate)) {
+            const dateClone = document.importNode(dateTemplate.content, true);
+            const dateEl = dateClone.querySelector('.date');
+            dateEl.textContent = transactionDate.toLocaleDateString(getLanguage(), {month: 'long', day: 'numeric'});
+            list.appendChild(dateClone);
+        }
+        const clone = document.importNode(operationTemplate.content, true);
+        const iconEl = clone.querySelector('.icon') as HTMLImageElement;
+        const descriptionEl = clone.querySelector('.description');
+        const amountEl = clone.querySelector('.amount');
+        const balanceEl = clone.querySelector('.balance');
+
+        iconEl.addEventListener('error', ()=>{
+            iconEl.src = 'no-icon.jpg';
+        });
+        if (o.iconUrl)
+            iconEl.src = o.iconUrl;
+        descriptionEl.textContent = o.descr;
+        amountEl.textContent = numberFormat(o.debit ? -o.amt : o.amt);
+        balanceEl.textContent = numberFormat(o.rest);
+
+        list.appendChild(clone);
+        lastDate = transactionDate;
+    });
+    toggleStep('info');
+}
+
 async function auth(): Promise<Token> {
     toggleStep('phone');
     const phone = await new Promise(function(resolve) {
@@ -324,17 +403,7 @@ async function main() {
         token = await auth();
         saveToken(token);
     }
-    toggleStep('info');
-    const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
-        Authorization: `Bearer ${token.accessToken}`,
-    });
-    const nameEl = document.querySelector('#info .name') as HTMLElement;
-    const emailEl = document.querySelector('#info .email') as HTMLElement;
-    const photoEl = document.querySelector('#info .photo img') as HTMLImageElement;
-    nameEl.innerText = overall.result.personalData.fullNameRu;
-    emailEl.innerText = overall.result.personalData.email.toLowerCase();
-    photoEl.src = overall.result.personalData.photoAbsoluteUrl;
-    console.log('overall', overall);
+    displayInfo();
 }
 
 main();
