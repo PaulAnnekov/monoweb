@@ -208,6 +208,8 @@ async function api(url: string, headers: { [key: string]: string } = {}, body?: 
     const res = await fetch('https://cors-anywhere.herokuapp.com/' + url, params);
     const json = await res.json();
     toggleLoader(false);
+    if (!res.ok)
+        throw new Error(JSON.stringify(json));
     return json;
 }
 
@@ -238,10 +240,14 @@ function getToken(): Token {
 
 async function tokenStep(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<Token> {
     toggleStep('pin');
-    // TODO: We will receive error if user logged in on another device.
-    const token: IApiToken = await api('https://pki-auth.monobank.com.ua/token', {
-        Fingerprint: getFingerprint()
-    }, grant);
+    let token: IApiToken;
+    try {
+        token = await api('https://pki-auth.monobank.com.ua/token', {
+            Fingerprint: getFingerprint()
+        }, grant);
+    } catch(e) {
+        return await auth();
+    }
     const keys = await api('https://pki-auth.monobank.com.ua/keys', {
         Authorization: `Bearer ${token.access_token}`,
         Fingerprint: getFingerprint(),
