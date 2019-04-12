@@ -10,6 +10,10 @@ body {
     display: none;
 }
 
+#phone {
+    width: 250px;
+}
+
 #loader {
     z-index: 1;
 }
