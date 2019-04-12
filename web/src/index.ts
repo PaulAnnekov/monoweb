@@ -195,7 +195,7 @@ function toggleLoader(toggle: boolean) {
 }
 
 function getLanguage(): string {
-    const valid = ['en', 'ru', 'uk'];
+    const valid = ['ru', 'uk'];
     let lang: string;
     if (navigator.language) {
         lang = navigator.language.split('-')[0];
