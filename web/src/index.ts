@@ -12,6 +12,28 @@ const CURRENCIES: { [index: string]: string } = {
     '978': '€',
 }
 
+class APIError extends Error {
+    status: number;
+    info: Object;
+
+    constructor(status: number, info: Object, ...params: any[]) {
+        super(...params);
+
+        // Maintains proper stack trace for where our error was thrown (only available on V8)
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, APIError);
+        }
+
+        this.name = 'APIError';
+        this.status = status;
+        this.info = info;
+    }
+
+    toString(): string {
+        return `${this.name}: ${this.status} ${JSON.stringify(this.info)}`;
+    }
+}
+
 let token: Token;
 
 interface IApiToken {
@@ -223,7 +245,7 @@ async function api(url: string, headers: { [key: string]: string } = {}, body?: 
     const json = await res.json();
     toggleLoader(false);
     if (!res.ok)
-        throw new Error(JSON.stringify(json));
+        throw new APIError(res.status, json);
     return json;
 }
 
@@ -243,6 +265,10 @@ function toggleStep(stepID: string) {
 
 function saveToken(token: Token) {
     localStorage.setItem('token', serialize(token));
+}
+
+function resetToken() {
+    localStorage.removeItem('token');
 }
 
 function getToken(): Token {
@@ -301,11 +327,27 @@ function isSameDay(d1: Date, d2: Date): boolean {
 }
 
 async function displayInfo() {
-    const overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
-        Authorization: `Bearer ${token.accessToken}`,
-    });
-    console.log('overall', overall);
-    const card = overall.result.cards[0];
+    let overall, statement, card;
+    try {
+        overall = await api('https://mob-gateway.monobank.com.ua/api/app-overall', {
+            Authorization: `Bearer ${token.accessToken}`,
+        });
+        console.log('overall', overall);
+        card = overall.result.cards[0];
+        statement = await api(`https://mob-gateway.monobank.com.ua/api/card/${card.uid}/statement?limit=50&v2=false`, {
+            Authorization: `Bearer ${token.accessToken}`,
+        });
+        console.log('statement', statement);
+    } catch(e) {
+        if (!(e instanceof APIError) || e.status != 401) {
+            throw e;
+        }
+        // TODO: It can also mean access token expired and we just need to
+        // refresh it.
+        resetToken();
+        main();
+        return;
+    }
     const personalData = overall.result.personalData;
     const nameEl = document.querySelector('#info .name');
     const photoEl = document.querySelector('#info .photo') as HTMLImageElement;
@@ -315,10 +357,6 @@ async function displayInfo() {
     photoEl.src = personalData.photoAbsoluteUrl;
     balanceEl.textContent = `${numberFormat(card.balance.balance)} ${CURRENCIES[card.balance.ccy]}`;
     cardEl.textContent = `*${card.cardNum.slice(-4)}`;
-    const statement = await api(`https://mob-gateway.monobank.com.ua/api/card/${card.uid}/statement?limit=50&v2=false`, {
-        Authorization: `Bearer ${token.accessToken}`,
-    });
-    console.log('statement', statement);
     const operationTemplate = document.querySelector('.operation-template') as HTMLTemplateElement;
     const dateTemplate = document.querySelector('.date-template') as HTMLTemplateElement;
     const list = document.querySelector('.statement .list');
