@@ -373,9 +373,10 @@ async function auth(): Promise<Token> {
     });
     const code = await new Promise(function(resolve) {
         function onInput() {
-            if (smsEl.value.length != 4)
+            const value = smsEl.value.replace(/\D/g, '');
+            if (value.length != 4)
                 return;
-            resolve(smsEl.value);
+            resolve(value);
         }
         const smsEl = document.querySelector('#sms') as HTMLInputElement;
         smsEl.addEventListener('input', onInput);
