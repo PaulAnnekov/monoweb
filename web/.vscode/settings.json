@@ -9,5 +9,7 @@
         "monobank",
         "secp",
         "vuex"
-    ]
+    ],
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
 }

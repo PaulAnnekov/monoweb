@@ -1,6 +1,43 @@
 import 'reflect-metadata'; // required by 'class-transformer'
 import { Type } from 'class-transformer';
 
+export interface Operation {
+  id: string;
+  type: string;
+  category: string;
+  descr: string;
+  tranDate: string;
+  // Only relevant for type='PUSH'.
+  descrFull?: string;
+  // Only relevant for type='FINANCIAL'.
+  ccy?: string;
+  iconUrl?: string;
+  debit?: boolean;
+  amt?: number;
+  rest?: number;
+}
+
+export interface PersonalData {
+  id: string;
+  uid: string;
+  email: string;
+  fullNameEn: string;
+  fullNameRu: string;
+  fullNameUk: string;
+  phone: string;
+  photoAbsoluteUrl: string;
+}
+
+export interface Card {
+  cardNum: string;
+  balance: {
+    balance: number;
+    credit: number;
+    personal: number;
+    ccy: string;
+  };
+}
+
 export interface IApiToken {
     access_token: string;
     refresh_token: string;

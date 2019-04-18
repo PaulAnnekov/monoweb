@@ -38,5 +38,12 @@ export default class Home extends Vue {
     position: absolute;
     top: 50%;
     left: 50%;
+    background-color: #fff;
+    padding: 20px 0 0;
+    border-radius: 30px;
+    width: 500px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
 }
 </style>

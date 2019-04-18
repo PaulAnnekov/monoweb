@@ -30,6 +30,7 @@
 <script lang='ts'>
 import { Component, Vue } from 'vue-property-decorator';
 import { Action, State } from 'vuex-class';
+import { Card, PersonalData, Operation } from '../types';
 
 function getLanguage(): string {
   const valid = ['ru', 'uk'];
@@ -63,14 +64,14 @@ function getLanguage(): string {
 })
 export default class Transactions extends Vue {
   @Action('getTransactions') getTransactions: any;
-  @State('card') card: {};
-  @State('personalData') personalData: object;
+  @State('card') card: Card;
+  @State('personalData') personalData: PersonalData;
   @State('error') error: string;
   @State('loading') loading: string;
 
   get statements() {
     return this.$store.state.statements.filter(
-      (o: any) => o.type === 'FINANCIAL',
+      (o: Operation) => o.type === 'FINANCIAL',
     );
   }
 

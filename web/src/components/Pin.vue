@@ -1,6 +1,7 @@
 <template>
   <div class="pin-view">
-    <input class="pin" placeholder="ПИН код" v-model="pin" />
+    <div class="title">Введите ПИН-код</div>
+    <input class="pin" v-model="pin" type="password" size="4" />
     <div v-if="error" class="error">{{ error }}</div>
     <loader v-if="loading" />
   </div>
@@ -30,20 +31,17 @@ export default class Pin extends Vue {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="less">
-h3 {
-  margin: 40px 0 0;
+.pin-view {
+  text-align: center;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+.pin {
+  font-size: 200%;
+  color: #fa5255;
+  border: 0;
+  background: none;
+  outline: 0 !important;
+  letter-spacing: 23px;
+  margin-top: 50px;
 }
 </style>

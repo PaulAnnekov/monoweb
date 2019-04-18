@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex, { ActionContext } from 'vuex';
 import 'reflect-metadata'; // required by 'class-transformer'
 import { serialize, deserialize, Type } from 'class-transformer';
-import { Token, IGrantTypePassword, IGrantTypeRefreshToken } from './types';
+import { Token, IGrantTypePassword, IGrantTypeRefreshToken, PersonalData, Card, Operation } from './types';
 import ky from 'ky';
 import * as api from './services/api';
 import * as crypto from './services/crypto';
@@ -34,9 +34,9 @@ const initialState = {
   pin: '',
   loading: false,
   error: false as string | boolean,
-  personalData: {},
-  card: {},
-  statements: [],
+  personalData: {} as PersonalData,
+  card: {} as Card,
+  statements: [] as Operation[],
 };
 
 type StateType = typeof initialState;
@@ -49,13 +49,13 @@ export default new Vuex.Store({
     },
   },
   mutations: {
-    setPersonalData(state: StateType, personalData: object) {
+    setPersonalData(state: StateType, personalData: PersonalData) {
       state.personalData = personalData;
     },
     setStatements(state: StateType, statements: []) {
       state.statements = statements;
     },
-    setCard(state: StateType, card: object) {
+    setCard(state: StateType, card: Card) {
       state.card = card;
     },
     setPin(state: StateType, pin: string) {

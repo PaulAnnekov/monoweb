@@ -20,10 +20,7 @@ class APIError extends Error {
         this.name = 'APIError';
         this.status = status;
         this.info = info;
-    }
-
-    toString(): string {
-        return `${this.name}: ${this.status} ${JSON.stringify(this.info)}`;
+        this.message = `${this.status} ${JSON.stringify(this.info)}`;
     }
 }
 

@@ -5,7 +5,7 @@
 </template>
 
 <style lang="css">
-@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');
 
 body {
     font-family: 'Roboto', sans-serif;
