@@ -1,10 +1,10 @@
 <template>
   <div class="home">
-    <div class="auth-wrapper">
+    <div class="auth-wrapper" v-if="!token || token.isExpired()">
       <auth v-if="!token && !hasGrantData" />
       <pin v-if="token && token.isExpired() || !token && hasGrantData" />
     </div>
-    <transactions v-if="token && !token.isExpired()" />
+    <transactions v-else />
   </div>
 </template>
 

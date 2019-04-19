@@ -3,14 +3,14 @@
     <form v-on:submit.prevent="submit" v-if="!otp">
       <div class="phone-wrapper">
         <span class="sign">+</span>
-        <the-mask class="phone" type="tel" v-model="phone" mask="### ## ### ####" autofocus :disabled="loading"></the-mask>
+        <the-mask class="phone" type="tel" v-focus="true" v-model="phone" mask="### ## ### ####" :disabled="loading"></the-mask>
       </div>
       <button :disabled="phone.length != 12 || loading">Далее</button>
     </form>
     <div class="sms-wrapper" v-if="otp">
       <div class="title">Введите код из СМС</div>
       <div class="sms-input">
-        <the-mask class="sms" v-model="code" mask="####" autofocus :disabled="loading" size="4"></the-mask>
+        <the-mask class="sms" v-focus="true" v-model="code" mask="####" :disabled="loading" size="4"></the-mask>
         <input class="hint" :value="hint" size="4" />
       </div>
     </div>

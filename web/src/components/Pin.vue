@@ -1,7 +1,7 @@
 <template>
   <div class="pin-view">
     <div class="title">Введите ПИН-код</div>
-    <input class="pin" v-model="pin" type="password" size="4" />
+    <input class="pin" v-model="pin" v-focus="true" type="password" size="4" />
     <div v-if="error" class="error">{{ error }}</div>
     <loader v-if="loading" />
   </div>

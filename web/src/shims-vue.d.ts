@@ -5,3 +5,4 @@ declare module '*.vue' {
 
 declare module 'vue-the-mask';
 declare module 'vue-security-code';
+declare module 'vue-focus';
