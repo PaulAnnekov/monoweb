@@ -1,5 +1,6 @@
 import * as CryptoJS from 'crypto-js';
-import { IGrantTypeRefreshToken, IGrantTypePassword, Token, IApiToken } from '@/types';
+import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '@/types';
+import { IToken, ICategory } from './types';
 
 const PLATFORM = 'android';
 const APP_VERSION_NAME = '1.21.4';
@@ -98,20 +99,20 @@ export async function otp(phone: string) {
     });
 }
 
-export async function token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IApiToken> {
+export async function token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IToken> {
     return api('https://pki-auth.monobank.com.ua/token', {
         Fingerprint: getFingerprint(),
     }, grant);
 }
 
-export async function keys({ access_token }: IApiToken) {
+export async function keys({ access_token }: IToken) {
     return api('https://pki-auth.monobank.com.ua/keys', {
         Authorization: `Bearer ${access_token}`,
         Fingerprint: getFingerprint(),
     });
 }
 
-export async function auth({ access_token }: IApiToken, sign: any): Promise<IApiToken> {
+export async function auth({ access_token }: IToken, sign: any): Promise<IToken> {
     return api('https://pki-auth.monobank.com.ua/auth', {
         Authorization: `Bearer ${access_token}`,
         Fingerprint: getFingerprint(),
@@ -124,6 +125,13 @@ export async function appOverall({ accessToken }: Token) {
     return api('https://mob-gateway.monobank.com.ua/api/app-overall', {
         Authorization: `Bearer ${accessToken}`,
     });
+}
+
+export async function categories({ accessToken }: Token): Promise<ICategory[]> {
+  const res = await api('https://mob-gateway.monobank.com.ua/api/statement/categories', {
+      Authorization: `Bearer ${accessToken}`,
+  });
+  return res.result.dc;
 }
 
 export async function cardStatement({ accessToken }: Token, uid: string) {

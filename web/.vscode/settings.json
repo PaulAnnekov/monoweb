@@ -1,15 +1,18 @@
 {
     "cSpell.words": [
-        "aes",
-        "algo",
-        "decryptor",
-        "descr",
-        "deserialize",
-        "k",
-        "monobank",
-        "secp",
-        "vuex"
+      "aes",
+      "algo",
+      "decryptor",
+      "descr",
+      "deserialize",
+      "k",
+      "mobx",
+      "monobank",
+      "secp",
+      "teamthread",
+      "vuex"
     ],
     "editor.tabSize": 2,
-    "editor.detectIndentation": false
+    "editor.detectIndentation": false,
+    "files.trimTrailingWhitespace": true
 }

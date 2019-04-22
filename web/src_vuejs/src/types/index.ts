@@ -1,6 +1,6 @@
 import 'reflect-metadata'; // required by 'class-transformer'
 import { Type } from 'class-transformer';
-import { IToken } from '../services/api/types';
+import { IToken } from '@/services/api/types';
 
 export interface Operation {
   id: string;

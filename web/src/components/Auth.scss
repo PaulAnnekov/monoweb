@@ -1,0 +1,69 @@
+.auth {
+  height: 100%;
+}
+.phone-wrapper {
+  margin: 0 auto;
+  align-self: flex-end;
+}
+.sign {
+  user-select: none;
+}
+.phone, .sign, .sms, .hint {
+  font-size: 200%;
+}
+.phone, .sms, .hint {
+  border: 0;
+  background: none;
+  outline: 0 !important;
+}
+.sms-input {
+  position: relative;
+  text-align: center;
+  margin-top: 50px;
+  .sms, .hint {
+    font-family: 'Roboto Mono', monospace;
+    letter-spacing: 9px;
+  }
+  .hint {
+    position: absolute;
+    bottom: 0px;
+    z-index: -1;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+.sms-wrapper {
+  .title {
+    text-align: center;
+  }
+}
+form {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  flex-wrap: wrap;
+}
+button {
+  border: 0;
+  outline: 0;
+  line-height: 240%;
+  font-size: 120%;
+  background-color: #fa5255;
+  color: #fff;
+  width: 100%;
+  align-self: flex-end;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #ccc;
+  }
+
+  &:enabled:hover {
+    background-color: #cc4345;
+  }
+}
+
+.error {
+  margin: 10px auto 0;
+  color: #ff0005;
+}

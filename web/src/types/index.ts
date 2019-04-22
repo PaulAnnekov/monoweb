@@ -1,5 +1,6 @@
 import 'reflect-metadata'; // required by 'class-transformer'
 import { Type } from 'class-transformer';
+import { IToken } from '../services/api/types';
 
 export interface Operation {
   id: string;
@@ -38,13 +39,6 @@ export interface Card {
   };
 }
 
-export interface IApiToken {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    name?: string;
-}
-
 export interface IGrantTypePassword {
     channel: string;
     grant_type: string;
@@ -58,7 +52,7 @@ export interface IGrantTypeRefreshToken {
 }
 
 export class Token {
-    public static fromAPI(data: IApiToken): Token {
+    public static fromAPI(data: IToken): Token {
         const t = new Token();
         t.date = new Date();
         t.accessToken = data.access_token;

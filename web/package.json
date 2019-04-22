@@ -1,37 +1,35 @@
 {
-  "name": "src",
-  "version": "0.1.0",
-  "private": true,
+  "name": "Monoweb",
+  "version": "0.0.1",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "start": "webpack-dev-server"
   },
-  "dependencies": {
+  "author": "Paul Annekov",
+  "devDependencies": {
+    "@types/react-input-mask": "^2.0.1",
+    "@types/react-maskedinput": "^4.0.4",
     "@types/crypto-js": "^3.1.43",
     "@types/elliptic": "^6.4.6",
+    "@types/react-dom": "^16.0.9",
+    "css-loader": "^2.1.1",
+    "css-modules-typescript-loader": "^2.0.0",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.1.3",
+    "webpack": "^4.22.0",
+    "webpack-cli": "^3.3.1",
+    "webpack-dev-server": "^3.3.1"
+  },
+  "dependencies": {
+    "mobx": "^5.5.2",
+    "mobx-react": "^5.3.5",
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "react-number-format": "^4.0.7",
     "class-transformer": "^0.2.0",
     "crypto-js": "^3.1.9-1",
-    "ky": "^0.9.1",
-    "reflect-metadata": "^0.1.13",
-    "register-service-worker": "^1.6.2",
-    "vue": "^2.6.6",
-    "vue-class-component": "^6.0.0",
-    "vue-focus": "^2.1.0",
-    "vue-property-decorator": "^8.0.0",
-    "vue-router": "^3.0.1",
-    "vue-security-code": "^1.0.3",
-    "vue-the-mask": "^0.11.1",
-    "vuex": "^3.0.1",
-    "vuex-class": "^0.3.2"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-pwa": "^3.5.0",
-    "@vue/cli-plugin-typescript": "^3.5.0",
-    "@vue/cli-service": "^3.5.0",
-    "less": "^3.0.4",
-    "less-loader": "^4.1.0",
-    "typescript": "^3.2.1",
-    "vue-template-compiler": "^2.5.21"
+    "reflect-metadata": "^0.1.13"
   }
 }

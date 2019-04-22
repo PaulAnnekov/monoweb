@@ -1,8 +1,8 @@
-import { observer } from "mobx-react";
-import { RootStore } from "../store";
-import * as React from "react";
-import Error from "./Error";
-import Loader from "./Loader";
+import { observer } from 'mobx-react';
+import { RootStore } from '../store';
+import * as React from 'react';
+import Error from './Error';
+import Loader from './Loader';
 
 function getLanguage(): string {
   const valid = ['ru', 'uk'];

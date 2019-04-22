@@ -1,7 +1,7 @@
 <template>
   <div class="pin-view">
     <div class="title">Введите ПИН-код</div>
-    <input class="pin" v-model="pin" v-focus="true" type="password" size="4" />
+    <input class="pin" v-model="pin" v-focus="true" type="password" :disabled="loading" />
     <div v-if="error" class="error">{{ error }}</div>
     <loader v-if="loading" />
   </div>
@@ -43,5 +43,7 @@ export default class Pin extends Vue {
   outline: 0 !important;
   letter-spacing: 23px;
   margin-top: 50px;
+  width: 180px;
+  margin-left: 65px;
 }
 </style>

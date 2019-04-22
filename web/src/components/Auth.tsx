@@ -1,0 +1,86 @@
+import { observer } from 'mobx-react';
+import { RootStore } from '../store';
+import * as React from 'react';
+import Error from './Error';
+import Loader from './Loader';
+import * as s from './Auth.scss';
+import NumberFormat, { NumberFormatValues } from 'react-number-format';
+
+@observer
+export default class Auth extends React.Component<{store: RootStore}, {phone: string; code: string}> {
+  constructor(props: {store: RootStore}) {
+    super(props);
+
+    this.state = {
+      phone: '380',
+      code: '',
+    };
+  }
+
+  handleSubmit(event) {
+    this.props.store.getOTP(this.state.phone);
+    event.preventDefault();
+  }
+
+  get hint(): string {
+    return Array(this.state.code.length).fill(' ').concat(Array(4 - this.state.code.length).fill('_')).join('');
+  }
+
+  onCodeChange(v: NumberFormatValues) {
+    this.setState(Object.assign(this.state, {code: v.value}));
+    const code = v.value;
+    if (code.length !== 4) {
+      return;
+    }
+    this.props.store.setCode(code);
+  }
+
+  onPhoneChange(v: NumberFormatValues) {
+    this.setState(Object.assign(this.state, {phone: v.value}));
+  }
+
+  render() {
+    const store = this.props.store;
+    const state = this.state;
+
+    return (
+      <div className={s.auth}>
+      { !store.otp &&
+        <form onSubmit={(e) => this.handleSubmit(e)}>
+          <div className={s['phone-wrapper']}>
+            <span className={s.sign}>+</span>
+            <NumberFormat
+              className={s.phone}
+              autoFocus
+              type="tel"
+              defaultValue={state.phone}
+              onValueChange={(v) => this.onPhoneChange(v)}
+              disabled={store.loading}
+              format="### ## ### ####" />
+          </div>
+          { store.error && <Error className={s.error} message={store.error} /> }
+          <button disabled={state.phone.length !== 12 || store.loading}>Далее</button>
+        </form>
+      }
+      { store.otp &&
+        <div className={s['sms-wrapper']}>
+          <div className={s.title}>Введите код из СМС</div>
+          <div className={s['sms-input']}>
+            <NumberFormat
+              className={s.sms}
+              autoFocus
+              defaultValue={state.code}
+              onValueChange={(v) => this.onCodeChange(v)}
+              disabled={store.loading}
+              format="####"
+              size={4} />
+            <input className={s.hint} value={this.hint} size={4} readOnly />
+          </div>
+          { store.error && <Error className={s.error} message={store.error} /> }
+        </div>
+      }
+      { store.loading && <Loader /> }
+      </div>
+    );
+  }
+}
