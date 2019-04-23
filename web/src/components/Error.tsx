@@ -1,7 +1,8 @@
 import * as React from 'react';
+import * as s from './Error.scss';
 
 export default class extends React.Component<{className?: string, message: string | boolean}, {}> {
   render() {
-    return <div className={this.props.className || 'error'}>{ this.props.message}</div>;
+    return <div className={s.error}>{ this.props.message}</div>;
   }
 }

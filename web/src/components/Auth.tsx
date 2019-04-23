@@ -17,7 +17,7 @@ export default class Auth extends React.Component<{store: RootStore}, {phone: st
     };
   }
 
-  handleSubmit(event) {
+  handleSubmit(event: React.FormEvent) {
     this.props.store.getOTP(this.state.phone);
     event.preventDefault();
   }
@@ -58,7 +58,7 @@ export default class Auth extends React.Component<{store: RootStore}, {phone: st
               disabled={store.loading}
               format="### ## ### ####" />
           </div>
-          { store.error && <Error className={s.error} message={store.error} /> }
+          { store.error && <Error message={store.error} /> }
           <button disabled={state.phone.length !== 12 || store.loading}>Далее</button>
         </form>
       }
@@ -76,7 +76,7 @@ export default class Auth extends React.Component<{store: RootStore}, {phone: st
               size={4} />
             <input className={s.hint} value={this.hint} size={4} readOnly />
           </div>
-          { store.error && <Error className={s.error} message={store.error} /> }
+          { store.error && <Error message={store.error} /> }
         </div>
       }
       { store.loading && <Loader /> }

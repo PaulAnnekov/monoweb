@@ -17,3 +17,61 @@ export interface ICategory {
   refused: boolean;
   noFin: boolean;
 }
+
+export interface IKeys {
+  keys: {
+    name: string;
+    enc_key: string;
+  }[];
+}
+
+export interface IOverall {
+  result: {
+    personalData: {
+      email: string;
+      fullNameRu: string;
+      fullNameUk: string;
+      id: string;
+      phone: string;
+      photoAbsoluteUrl: string;
+      uid: string;
+    }
+    cards: {
+      balance: {
+        balance: number;
+        ccy: string;
+        credit: number;
+        personal: number;
+        usedCreditLimit: number;
+      },
+      cardNum: string;
+      currency: string;
+      expire: string;
+      uid: string;
+    }[]
+  }
+}
+
+export interface IStatement {
+  panStatement: {
+    listStmt: {
+      // Only relevant for type: "FINANCIAL".
+      amt?: number;
+      category: string;
+      // Only relevant for type: "FINANCIAL".
+      ccy?: string;
+      // Only relevant for type: "FINANCIAL".
+      debit?: boolean;
+      descr: string;
+      // Only relevant for type: "PUSH".
+      descrFull?: string;
+      id: string;
+      // Only relevant for type: "FINANCIAL".
+      rest?: number;
+      // Only relevant for type: "FINANCIAL", not always present.
+      iconUrl?: string;
+      tranDate: string;
+      type: string;
+    }[]
+  }
+}

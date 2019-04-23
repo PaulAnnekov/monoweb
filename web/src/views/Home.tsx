@@ -15,7 +15,7 @@ export class Home extends React.Component<{store: RootStore}, {}> {
       {!store.token || store.token.isExpired() ? (
         <div className={style['auth-wrapper']}>
           {!store.token && !store.hasGrantData && <Auth store={store} />}
-          {store.token && store.token.isExpired() || !store.token && store.hasGrantData && <Pin store={store} />}
+          {(store.token && store.token.isExpired() || !store.token && store.hasGrantData) && <Pin store={store} />}
         </div>
       ) : (<Transactions store={store} />)}
       </div>

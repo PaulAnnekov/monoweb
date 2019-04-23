@@ -1,7 +1,9 @@
 import * as elliptic from 'elliptic';
 import * as CryptoJS from 'crypto-js';
 
-// Generates key from enc_key and pin.
+/**
+ * Generates key from enc_key and pin.
+ */
 function getKey(pin: string, data: CryptoJS.WordArray): string {
     // https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js or only parts.
     function wordsArrayToIntArray(wordArray: CryptoJS.WordArray): Uint8Array {
@@ -39,7 +41,9 @@ function getKey(pin: string, data: CryptoJS.WordArray): string {
     return decrypted.toString() + decrypted1.toString();
 }
 
-// Generates private key from key.
+/**
+ * Generates private key from key
+ */
 function genPrivateKey(key: string): elliptic.ec.KeyPair {
     // https://cdn.jsdelivr.net/gh/indutny/elliptic/dist/elliptic.js
     const EC = elliptic.ec;
@@ -48,14 +52,18 @@ function genPrivateKey(key: string): elliptic.ec.KeyPair {
     return secp256k1.keyFromPrivate(key, 'hex');
 }
 
-// Signs data with a key.
+/**
+ * Signs data with a key
+ */
 function sign(key: elliptic.ec.KeyPair, data: string): elliptic.ec.Signature {
     const msg = CryptoJS.SHA256(data);
 
     return key.sign(msg.toString());
 }
 
-// Encodes signature according to monobank rules.
+/**
+ * Encodes signature according to monobank rules.
+ */
 function transformSignature(signature: elliptic.ec.Signature): string {
     function trim32(arr: number[]): Int8Array {
         const length = arr.length - 32;
@@ -93,6 +101,9 @@ function checkEncKeyLength(key: CryptoJS.LibWordArray): boolean {
     throw new Error(`Invalid key length = ${key.sigBytes}`);
 }
 
+/**
+ * Signs access token with a key derived from encryption key and pin.
+ */
 export function gen(encKeyBase64: string, pin: string, accessToken: string) {
     const encKey = CryptoJS.enc.Base64.parse(encKeyBase64);
     if (checkEncKeyLength(encKey)) {

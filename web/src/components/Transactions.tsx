@@ -3,6 +3,8 @@ import { RootStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
+import * as s from './Transactions.scss';
+import Image from 'react-image-fallback';
 
 function getLanguage(): string {
   const valid = ['ru', 'uk'];
@@ -20,12 +22,12 @@ export default class extends React.Component<{store: RootStore}, {}> {
     this.props.store.getTransactions();
   }
 
-  numberFormat(num: number) {
-    const formatter = new Intl.NumberFormat(getLanguage(), {
+  moneyFormat(num: number) {
+    const formatter = new Intl.NumberFormat('en', {
       maximumFractionDigits: 2,
       minimumFractionDigits: 2,
     });
-    return formatter.format(num);
+    return formatter.format(num).replace(/,/g, ' ');
   }
 
   currency(ccy: string): string {
@@ -43,126 +45,47 @@ export default class extends React.Component<{store: RootStore}, {}> {
     const state = this.state;
 
     return (
-      <div className="info-view">
-        <div className="user">
-          <img className="photo" src={store.personalData.photoAbsoluteUrl} />
-          <div className="name">{store.personalData.fullNameUk}</div>
-        </div>
-        <div className="statement">
-          <div className="card-info" v-if="card.balance">
-            <span
-              className="balance"
-            >{ this.numberFormat(store.card.balance.balance) } { this.currency(store.card.balance.ccy) }</span> (
-            <span className="card">*{ store.card.cardNum.slice(-4) }</span>)
+      <div className={s["info-view"]}>
+      {!store.loading && !store.error &&
+        <div>
+        {store.personalData &&
+          <div className={s.user}>
+            <img className={s.photo} src={store.personalData.photoAbsoluteUrl} />
+            <div className="name">{store.personalData.fullNameUk}</div>
           </div>
-          <div className="list">
-          {store.statements.map((o) => {
-            if (o.type !== 'FINANCIAL') {
-              return;
-            }
-            return <div className="operation" key={o.id}>
-              <img className="icon" src={o.iconUrl || 'empty'} />
-              <div className="description">{o.descr}</div>
-              <div className="amount-wrapper">
-                <div className="amount">{this.numberFormat(o.debit ? -o.amt : o.amt)}}</div>
-                <div className="balance">{this.numberFormat(o.rest)}</div>
-              </div>
-            </div>;
-          })}
+        }
+        {store.card && store.statements &&
+          <div className={s.statement}>
+            <div className={s["card-info"]}>
+              <span
+                className={s.balance}
+              >{ this.moneyFormat(store.card.balance.balance) } { this.currency(store.card.balance.ccy) }</span> (
+              <span className="card">*{ store.card.cardNum.slice(-4) }</span>)
+            </div>
+            <div className={s.list}>
+            {store.statements.map((o) => {
+              if (o.type !== 'FINANCIAL') {
+                return;
+              }
+              const category = this.props.store.categories
+                .find((c) => c.id == +o.category);
+              return <div className={s.operation} key={o.id}>
+                <Image className={s.icon} style={{backgroundColor: category.colorStartItem}} src={o.iconUrl} fallbackImage={category.icon} />
+                <div className={s.description}>{o.descr}</div>
+                <div className={s["amount-wrapper"]}>
+                  <div className={o.debit ? 'amount-debit' : s['amount-credit']}>{this.moneyFormat(o.debit ? -o.amt : o.amt)}</div>
+                  <div className={s.balance}>{this.moneyFormat(o.rest)}</div>
+                </div>
+              </div>;
+            })}
+            </div>
           </div>
+        }
         </div>
-        { store.error && <Error message={store.error} /> }
-        { store.loading && <Loader /> }
+      }
+      { store.error && <Error message={store.error} /> }
+      { store.loading && <Loader /> }
       </div>
     );
   }
 }
-
-{/* <style scoped lang="less">
-.info-view {
-  margin: 30px 30px 0 30px;
-
-  .user {
-    display: flex;
-    align-items: center;
-  }
-
-  .photo {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin-right: 5px;
-  }
-
-  .statement {
-    width: 500px;
-  }
-
-  .card-info {
-    display: flex;
-    align-items: center;
-    height: 55px;
-
-    .balance {
-      font-size: 130%;
-      margin-right: 15px;
-      color: #fff;
-    }
-  }
-
-  .list {
-    background-color: #fff;
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
-
-    .date {
-      text-align: center;
-      color: grey;
-      font-size: 80%;
-      margin-top: 20px;
-    }
-
-    .date:first-child {
-      margin-top: 0;
-    }
-  }
-
-  .operation {
-    display: flex;
-    align-items: center;
-    margin-top: 20px;
-
-    .icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      position: relative;
-      overflow: hidden;
-
-      &:after {
-        content: "";
-        background: #c09dae;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-    }
-
-    .description {
-      margin-left: 20px;
-    }
-
-    .amount-wrapper {
-      flex-grow: 1;
-      text-align: right;
-    }
-
-    .amount-wrapper .balance {
-      font-size: 70%;
-      color: grey;
-    }
-  }
-}
-</style> */}
