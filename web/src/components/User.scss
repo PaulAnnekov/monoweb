@@ -2,6 +2,10 @@
   padding: 20px;
   background: linear-gradient(to bottom left, #c5a2ad, #4764dc);
   flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
 
   .user-info {
     display: flex;
@@ -15,15 +19,45 @@
     }
   }
 
-  .card-info {
+  .cards {
     display: flex;
-    align-items: center;
-    height: 55px;
+    flex-direction: column;
+    align-items: flex-start;
 
-    .balance {
-      font-size: 130%;
-      margin-right: 15px;
-      color: #fff;
+    .card-info {
+      padding: 15px;
+      margin-left: -20px;
+
+      &:hover {
+        background-color: #fff;
+        border-radius: 0 10px 10px 0;
+        cursor: pointer;
+
+        .name {
+          color: #000;
+        }
+
+        .balance {
+          color: grey;
+        }
+      }
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      .name {
+        color: #ccc;
+      }
+
+      .balance {
+        text-align: right;
+        margin-top: 5px;
+        font-size: 130%;
+        color: #fff;
+      }
     }
   }
+
+
 }

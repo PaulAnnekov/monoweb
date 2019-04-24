@@ -32,6 +32,7 @@ export interface PersonalData {
 export interface Card {
   cardNum: string;
   uid: string;
+  currency: string;
   balance: {
     balance: number;
     credit: number;
