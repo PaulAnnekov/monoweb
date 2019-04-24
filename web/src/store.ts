@@ -7,16 +7,19 @@ import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
 import { ICategory } from './services/api/types';
 
+const isDemo = true;
+const tokenName = isDemo ? 'demoToken' : 'token';
+
 function saveToken(token: Token) {
-  localStorage.setItem('token', serialize(token));
+  localStorage.setItem(tokenName, serialize(token));
 }
 
 function resetToken() {
-  localStorage.removeItem('token');
+  localStorage.removeItem(tokenName);
 }
 
 function getToken(): Token | undefined {
-  const data = localStorage.getItem('token');
+  const data = localStorage.getItem(tokenName);
   if (!data) {
     return;
   }
@@ -36,15 +39,18 @@ export class RootStore {
   @observable card: Card;
   @observable statements: Operation[];
   @observable categories: ICategory[];
-  
+
   private api: API;
 
   constructor() {
-    // this.api = new DemoAPI();
-    this.api = new API((input: RequestInfo, init?: RequestInit) => {
-      input = 'https://cors-anywhere.herokuapp.com/' + input;
-      return fetch(input, init);
-    });
+    if (isDemo) {
+      this.api = new DemoAPI();
+    } else {
+      this.api = new API((input: RequestInfo, init?: RequestInit) => {
+        input = 'https://cors-anywhere.herokuapp.com/' + input;
+        return fetch(input, init);
+      });
+    }
   }
 
   getTransactions = flow(function *(this: RootStore) {
