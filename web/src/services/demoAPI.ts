@@ -56,10 +56,10 @@ export default class DemoAPI extends API {
       },
       cards: [{
         balance: {
-          balance: 100,
+          balance: 83.95,
           ccy: '980',
           credit: 0,
-          personal: 100,
+          personal: 83.95,
           usedCreditLimit: 0,
         },
         cardNum: '5555555555554444',
@@ -72,30 +72,46 @@ export default class DemoAPI extends API {
 
   async categories({ accessToken }: Token): Promise<ICategory[]> {
     return this.handle([{
-      id: 4,
-      icon: 'https://icons.monobank.com.ua/stmt/products_icon.png',
-      colorStartItem: '#d9541b',
-      colorEndItem: '#e96026',
-      names: {
-        RU: 'Продукты и супермаркеты',
-        UK: 'Продукти та супермаркети',
-      },
-      refused: false,
+      colorEndItem: '#693ecc',
+      colorStartItem: '#5d34ba',
+      icon: 'https://icons.monobank.com.ua/stmt/restaurant_icon.png',
+      id: 3,
+      names: {RU: 'Кафе и рестораны', UK: 'Кафе та ресторани'},
       noFin: false,
+      refused: false,
+    }, {
+      colorEndItem: '#078d97',
+      colorStartItem: '#079096',
+      icon: 'https://icons.monobank.com.ua/stmt/accrual_percent_icon.png',
+      id: 21,
+      names: {RU: '% на остаток', UK: '% на залишок'},
+      noFin: false,
+      refused: false
     }]);
   }
 
   async cardStatement({ accessToken }: Token, uid: string): Promise<IStatement> {
     return this.handle({panStatement: {
       listStmt: [{
-        amt: 100,
-        category: '4',
+        amt: 44.25,
+        category: '3',
+        ccy: '980',
+        debit: true,
+        descr: 'McDonalds',
+        iconUrl: 'https://icons.monobank.com.ua/inf/icon-mdpi/mcdonalds.png',
+        id: '2',
+        rest: 83.95,
+        tranDate: '2019-03-25T13:59:02+02:00',
+        type: 'FINANCIAL',
+      }, {
+        amt: 128.2,
+        category: '21',
         ccy: '980',
         debit: false,
-        descr: 'Test',
+        descr: 'Нарахування відсотків за лютий',
         id: '1',
-        rest: 200,
-        tranDate: '2019-02-24T11:02:14+02:00',
+        rest: 128.2,
+        tranDate: '2019-03-01T09:15:14+02:00',
         type: 'FINANCIAL',
       }]
     }});

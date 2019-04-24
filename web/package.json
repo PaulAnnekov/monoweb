@@ -9,7 +9,6 @@
     "@types/crypto-js": "^3.1.43",
     "@types/elliptic": "^6.4.6",
     "@types/react-dom": "^16.0.9",
-    "@types/react-image-fallback": "^8.0.1",
     "@types/react-input-mask": "^2.0.1",
     "@types/react-maskedinput": "^4.0.4",
     "css-loader": "^2.1.1",
@@ -30,7 +29,6 @@
     "mobx-react": "^5.3.5",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-image-fallback": "^8.0.0",
     "react-number-format": "^4.0.7",
     "reflect-metadata": "^0.1.13"
   }

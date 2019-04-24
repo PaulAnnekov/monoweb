@@ -4,7 +4,6 @@ import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
 import * as s from './Transactions.scss';
-import Image from 'react-image-fallback';
 
 function getLanguage(): string {
   const valid = ['ru', 'uk'];
@@ -70,7 +69,9 @@ export default class extends React.Component<{store: RootStore}, {}> {
               const category = this.props.store.categories
                 .find((c) => c.id == +o.category);
               return <div className={s.operation} key={o.id}>
-                <Image className={s.icon} style={{backgroundColor: category.colorStartItem}} src={o.iconUrl} fallbackImage={category.icon} />
+                <div className={s.icon}
+                  style={{backgroundImage: `url(${o.iconUrl}), url(${category.icon}), linear-gradient(to bottom right, ${category.colorStartItem}, ${category.colorEndItem})`}}>
+                </div>
                 <div className={s.description}>{o.descr}</div>
                 <div className={s["amount-wrapper"]}>
                   <div className={o.debit ? 'amount-debit' : s['amount-credit']}>{this.moneyFormat(o.debit ? -o.amt : o.amt)}</div>
