@@ -1,0 +1,29 @@
+.user {
+  padding: 20px;
+  background: linear-gradient(to bottom left, #c5a2ad, #4764dc);
+  flex-grow: 1;
+
+  .user-info {
+    display: flex;
+    align-items: center;
+
+    .photo {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+  }
+
+  .card-info {
+    display: flex;
+    align-items: center;
+    height: 55px;
+
+    .balance {
+      font-size: 130%;
+      margin-right: 15px;
+      color: #fff;
+    }
+  }
+}

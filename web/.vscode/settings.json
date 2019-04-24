@@ -14,5 +14,8 @@
     ],
     "editor.tabSize": 2,
     "editor.detectIndentation": false,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "files.exclude": {
+      "**/*.scss.d.ts": true
+    }
 }

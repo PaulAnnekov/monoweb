@@ -21,15 +21,16 @@ module.exports = {
     }, {
       test: /\.scss$/,
       use: [
-        'style-loader', 
-        'css-modules-typescript-loader', 
+        'style-loader',
+        'css-modules-typescript-loader',
         {
           loader: 'css-loader',
           options: {
             sourceMap: true,
-            modules: true
+            modules: true,
+            localIdentName: '[local]--[hash:base64]',
           }
-        }, 
+        },
         {
           loader: "sass-loader",
           options: {sourceMap: true}

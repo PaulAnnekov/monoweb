@@ -5,7 +5,5 @@ import store from './store';
 import "./index.scss";
 
 ReactDOM.render(
-  <div id="app">
-    <Home store={store} />
-  </div>, document.getElementById('app'),
+  <Home store={store} />, document.getElementById('app'),
 );

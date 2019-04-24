@@ -58,28 +58,21 @@ function getAppVersion(): string {
     return `${PLATFORM}-${APP_VERSION_CODE}`;
 }
 
-function getLanguage(): string {
-    const valid = ['ru', 'uk'];
-    let lang = '';
-    if (navigator.language) {
-        lang = navigator.language.split('-')[0];
-    }
-
-    return lang && valid.includes(lang) ? lang : 'uk';
-}
-
 export default class API {
   private fetch: typeof window.fetch;
+  private language: string;
 
-  constructor(fetch?: typeof window.fetch) {
-    this.fetch = fetch || window.fetch;
+  constructor(options?: {fetch?: typeof window.fetch, language?: string}) {
+    options = options||{};
+    this.fetch = options.fetch || window.fetch;
+    this.language = options.language || 'uk';
   }
 
   private async api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
     headers['Device-Id'] = getDeviceID();
     headers['Device-Name'] = getDeviceName();
     headers['App-Version'] = getAppVersion();
-    headers.Lang = getLanguage();
+    headers.Lang = this.language;
 
     const params: RequestInit = {
         method: body ? 'POST' : 'GET',

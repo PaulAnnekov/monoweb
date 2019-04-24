@@ -11,7 +11,7 @@ export default class DemoAPI extends API {
         } else {
           resolve(data);
         }
-      }, 1000);
+      }, 200);
     });
   }
 

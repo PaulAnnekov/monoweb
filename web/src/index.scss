@@ -1,7 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');
 
+html, body, :global(#app) {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:global(#app) {
+  /* To get rid of a scroll bar. */
+  box-sizing: border-box;
+  padding: 20px;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #c09dae;
-    margin: 0;
+    background-color: #000;
 }

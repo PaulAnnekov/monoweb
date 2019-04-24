@@ -6,8 +6,9 @@ import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
 import { ICategory } from './services/api/types';
+import { getLanguage } from './services/utils';
 
-const isDemo = true;
+const isDemo = false;
 const tokenName = isDemo ? 'demoToken' : 'token';
 
 function saveToken(token: Token) {
@@ -36,8 +37,8 @@ export class RootStore {
   @observable loading = false;
   @observable error: string | boolean;
   @observable personalData: PersonalData;
-  @observable card: Card;
-  @observable statements: Operation[];
+  @observable cards: Card[];
+  @observable statement: Operation[];
   @observable categories: ICategory[];
 
   private api: API;
@@ -46,30 +47,46 @@ export class RootStore {
     if (isDemo) {
       this.api = new DemoAPI();
     } else {
-      this.api = new API((input: RequestInfo, init?: RequestInit) => {
-        input = 'https://cors-anywhere.herokuapp.com/' + input;
-        return fetch(input, init);
+      this.api = new API({
+        fetch: (input: RequestInfo, init?: RequestInit) => {
+          input = 'https://cors-anywhere.herokuapp.com/' + input;
+          return fetch(input, init);
+        },
+        language: getLanguage()
       });
     }
   }
 
-  getTransactions = flow(function *(this: RootStore) {
+  getTransactions = flow(function *(this: RootStore, cardUID: string) {
     this.loading = true;
     this.error = false;
     try {
+      // TODO: Load once.
       const categories = yield this.api.categories(this.token as Token);
-      const overall = yield this.api.appOverall(this.token as Token);
-      const card = overall.result.cards[0];
-      const statement = yield this.api.cardStatement(this.token as Token, card.uid);
-      this.personalData = overall.result.personalData;
-      this.statements = statement.panStatement.listStmt;
-      this.card = card;
+      const statement = yield this.api.cardStatement(this.token as Token, cardUID);
+      this.statement = statement.panStatement.listStmt;
       this.categories = categories;
     } catch (e) {
       this.error = e.toString();
     } finally {
       this.loading = false;
     }
+  });
+
+  getPersonalData = flow(function *(this: RootStore) {
+    this.loading = true;
+    this.error = false;
+    try {
+      const overall = yield this.api.appOverall(this.token as Token);
+      this.cards = overall.result.cards;
+      this.personalData = overall.result.personalData;
+    } catch (e) {
+      this.error = e.toString();
+      return;
+    } finally {
+      this.loading = false;
+    }
+    yield this.getTransactions(this.cards[0].uid);
   });
 
   getOTP = flow(function *(this: RootStore, phone: string) {
