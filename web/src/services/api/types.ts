@@ -52,26 +52,30 @@ export interface IOverall {
   }
 }
 
+export interface IOperation {
+  // Only relevant for type: "FINANCIAL".
+  amt?: number;
+  category: string;
+  // Only relevant for type: "FINANCIAL".
+  ccy?: string;
+  // Only relevant for type: "FINANCIAL".
+  debit?: boolean;
+  descr: string;
+  // Only relevant for type: "PUSH".
+  descrFull?: string;
+  id: string;
+  // Only relevant for type: "FINANCIAL".
+  rest?: number;
+  // Only relevant for type: "FINANCIAL", not always present.
+  iconUrl?: string;
+  dateTime: string;
+  tranDate: string;
+  type: string;
+}
+
 export interface IStatement {
   panStatement: {
-    listStmt: {
-      // Only relevant for type: "FINANCIAL".
-      amt?: number;
-      category: string;
-      // Only relevant for type: "FINANCIAL".
-      ccy?: string;
-      // Only relevant for type: "FINANCIAL".
-      debit?: boolean;
-      descr: string;
-      // Only relevant for type: "PUSH".
-      descrFull?: string;
-      id: string;
-      // Only relevant for type: "FINANCIAL".
-      rest?: number;
-      // Only relevant for type: "FINANCIAL", not always present.
-      iconUrl?: string;
-      tranDate: string;
-      type: string;
-    }[]
+    full: boolean;
+    listStmt: IOperation[]
   }
 }

@@ -32,7 +32,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
       {store.cards &&
         <div className={s.cards}>
           {store.cards.map((c) => {
-            return <div className={s["card-info"]} key={c.uid}>
+            return <div className={s['card-info'] + (c.uid == store.selectedCard ? ` ${s.selected}` : '')} key={c.uid}>
               <div className={s.name}>{this.getCardName(c)} <span className="number">(*{ c.cardNum.slice(-4) })</span></div>
               <div className={s.balance}>{ moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }</div>
             </div>

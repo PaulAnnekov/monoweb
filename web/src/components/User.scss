@@ -28,7 +28,7 @@
       padding: 15px;
       margin-left: -20px;
 
-      &:hover {
+      &.selected, &:hover {
         background-color: #fff;
         border-radius: 0 10px 10px 0;
         cursor: pointer;

@@ -4,6 +4,7 @@ import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
 import { moneyFormat, getLanguage } from '../services/utils';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import * as s from './Transactions.scss';
 
@@ -18,15 +19,23 @@ export default class extends React.Component<{store: RootStore}, {}> {
   }
 
   private formatDate(date: Date) {
-    return date.toLocaleDateString(getLanguage(),
-      {month: 'long', day: 'numeric'});
+    const now = new Date();
+    const options: {[index: string]: string} = {month: 'long', day: 'numeric'};
+    if (now.getFullYear() !== date.getFullYear()) {
+      options.year = 'numeric';
+    }
+    return date.toLocaleDateString(getLanguage(), options);
+  }
+
+  private loadTransactions() {
+    this.props.store.getTransactions(this.props.store.selectedCard);
   }
 
   render() {
     const store = this.props.store;
     let lastDate: Date;
     const list = [];
-    store.statement && store.statement.forEach((o) => {
+    store.statement && store.statement.operations.forEach((o) => {
       if (o.type !== 'FINANCIAL') {
         return;
       }
@@ -54,11 +63,20 @@ export default class extends React.Component<{store: RootStore}, {}> {
 
     return (
       <div className={s.statement}>
-      {!store.loading && !store.error && list.length &&
-        <div className={s.list}>{list}</div>
+      {!store.error && store.selectedCard &&
+        <div className={s.list}>
+          <InfiniteScroll
+            pageStart={0}
+            loadMore={() => this.loadTransactions()}
+            hasMore={!store.statement || !store.statement.isFull}
+            loader={<div key={0}>Loading...</div>}
+            useWindow={false}
+          >
+            {list}
+          </InfiniteScroll>
+        </div>
       }
       { store.error && <Error message={store.error} /> }
-      { store.loading && <Loader /> }
       </div>
     );
   }

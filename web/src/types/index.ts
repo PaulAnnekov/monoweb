@@ -2,22 +2,6 @@ import 'reflect-metadata'; // required by 'class-transformer'
 import { Type } from 'class-transformer';
 import { IToken } from '../services/api/types';
 
-export interface Operation {
-  id: string;
-  type: string;
-  category: string;
-  descr: string;
-  tranDate: string;
-  // Only relevant for type='PUSH'.
-  descrFull?: string;
-  // Only relevant for type='FINANCIAL'.
-  ccy?: string;
-  iconUrl?: string;
-  debit?: boolean;
-  amt?: number;
-  rest?: number;
-}
-
 export interface PersonalData {
   id: string;
   uid: string;

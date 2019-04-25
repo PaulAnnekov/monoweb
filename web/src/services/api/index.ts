@@ -144,9 +144,19 @@ export default class API {
     return res.result.dc;
   }
 
-  async cardStatement({ accessToken }: Token, uid: string): Promise<IStatement> {
-      return this.api(`https://mob-gateway.monobank.com.ua/api/card/${uid}/statement?limit=50&v2=false`, {
-          Authorization: `Bearer ${accessToken}`,
-      });
+  async cardStatement({ accessToken }: Token, uid: string, params?: {limit?: number, direction?: string, dateFrom?: Date, stmtId?: string}): Promise<IStatement> {
+    params = params || {};
+    const query = {
+      v2: false,
+      limit: params.limit || 50,
+      direction: params.direction,
+      stmtId: params.stmtId,
+      dateFrom: params.dateFrom && params.dateFrom.toISOString(),
+    };
+    const url = new URL(`https://mob-gateway.monobank.com.ua/api/card/${uid}/statement`);
+    Object.keys(query).forEach(key => query[key] !== undefined && url.searchParams.append(key, query[key]));
+    return this.api(url.href, {
+        Authorization: `Bearer ${accessToken}`,
+    });
   }
 }

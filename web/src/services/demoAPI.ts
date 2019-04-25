@@ -92,6 +92,7 @@ export default class DemoAPI extends API {
 
   async cardStatement({ accessToken }: Token, uid: string): Promise<IStatement> {
     return this.handle({panStatement: {
+      full: true,
       listStmt: [{
         amt: 44.25,
         category: '3',
@@ -101,6 +102,7 @@ export default class DemoAPI extends API {
         iconUrl: 'https://icons.monobank.com.ua/inf/icon-mdpi/mcdonalds.png',
         id: '2',
         rest: 83.95,
+        dateTime: '2019-03-25T13:59:02.000+02:00',
         tranDate: '2019-03-25T13:59:02+02:00',
         type: 'FINANCIAL',
       }, {
@@ -111,6 +113,7 @@ export default class DemoAPI extends API {
         descr: 'Нарахування відсотків за лютий',
         id: '1',
         rest: 128.2,
+        dateTime: '2019-03-01T09:15:14.000+02:00',
         tranDate: '2019-03-01T09:15:14+02:00',
         type: 'FINANCIAL',
       }]
