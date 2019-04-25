@@ -22,11 +22,11 @@
   .cards {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
 
     .card-info {
       padding: 15px;
       margin-left: -20px;
+      margin-top: 10px;
 
       &.selected, &:hover {
         background-color: #fff;
@@ -48,6 +48,7 @@
 
       .name {
         color: #ccc;
+        text-align: right;
       }
 
       .balance {

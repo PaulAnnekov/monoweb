@@ -69,7 +69,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
             pageStart={0}
             loadMore={() => this.loadTransactions()}
             hasMore={!store.statement || !store.statement.isFull}
-            loader={<div key={0}>Loading...</div>}
+            loader={<div className={s.loader} key={0}>Загрузка...</div>}
             useWindow={false}
           >
             {list}
