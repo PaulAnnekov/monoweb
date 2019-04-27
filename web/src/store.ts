@@ -1,7 +1,7 @@
 import 'reflect-metadata'; // required by 'class-transformer'
 import { serialize, deserialize } from 'class-transformer';
 import { Token, PersonalData, Card } from './types';
-import API from './services/api';
+import API, { APIError } from './services/api';
 import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
@@ -133,7 +133,7 @@ export class RootStore {
         refresh_token: this.token.refreshToken,
       };
     } else {
-      this.error = 'Ошибка приложения';
+      this.error = 'Помилка програми';
       this.loading = false;
       this.pin = '';
       return;
@@ -151,8 +151,17 @@ export class RootStore {
       this.token = Token.fromAPI(token);
       saveToken(this.token);
     } catch (e) {
-      this.error = e.toString();
       this.pin = '';
+      // Most likely refresh_token is invalidated by logging in on another
+      // device.
+      if (e instanceof APIError && e.status == 400 && this.token) {
+        this.token = undefined;
+        resetToken();
+        // TODO: Localize.
+        this.error = 'Авторизація на цьому пристрої скинулася, увійдіть заново';
+        return;
+      }
+      this.error = e.toString();
     } finally {
       this.loading = false;
     }
