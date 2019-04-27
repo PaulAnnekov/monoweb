@@ -24,6 +24,10 @@ export default class extends React.Component<{store: RootStore}, {}> {
     return names[card.currency];
   }
 
+  onCardChange(uid: string) {
+    this.props.store.changeCard(uid);
+  }
+
   render() {
     const store = this.props.store;
 
@@ -32,10 +36,19 @@ export default class extends React.Component<{store: RootStore}, {}> {
       {store.cards &&
         <div className={s.cards}>
           {store.cards.map((c) => {
-            return <div className={s['card-info'] + (c.uid == store.selectedCard ? ` ${s.selected}` : '')} key={c.uid}>
-              <div className={s.name}>{this.getCardName(c)} <span className="number">(*{ c.cardNum.slice(-4) })</span></div>
-              <div className={s.balance}>{ moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }</div>
-            </div>
+            return (
+              <div
+                className={s['card-info'] + (c.uid == store.selectedCard ? ` ${s.selected}` : '')}
+                key={c.uid}
+                onClick={() => this.onCardChange(c.uid)}>
+                <div className={s.name}>
+                  {this.getCardName(c)} <span className="number">(*{ c.cardNum.slice(-4) })</span>
+                </div>
+                <div className={s.balance}>
+                  { moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }
+                </div>
+              </div>
+            )
           })}
         </div>
       }

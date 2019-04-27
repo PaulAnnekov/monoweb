@@ -58,16 +58,24 @@ export class RootStore {
     }
   }
 
-  getTransactions = flow(function *(this: RootStore, cardUID: string) {
+  getTransactions = flow(function *(this: RootStore) {
     this.error = false;
     try {
+      if (!this.categories) {
+        const categories = yield this.api.categories(this.token as Token);
+        this.categories = categories;
+      }
       let lastStatement = this.statement && this.statement.operations.length &&
         this.statement.operations[this.statement.operations.length-1];
-      const statement = yield this.api.cardStatement(this.token as Token, cardUID, {
-        direction: this.statement && 'DOWN',
-        stmtId: lastStatement && lastStatement.id,
-        dateFrom: lastStatement && new Date(lastStatement.dateTime),
-      });
+      const statement = yield this.api.cardStatement(
+        this.token as Token,
+        this.selectedCard,
+        {
+          direction: this.statement && 'DOWN',
+          stmtId: lastStatement && lastStatement.id,
+          dateFrom: lastStatement && new Date(lastStatement.dateTime),
+        },
+      );
       if (!this.statement) {
         this.statement = {
           isFull: statement.panStatement.full,
@@ -86,10 +94,7 @@ export class RootStore {
     this.loading = true;
     this.error = false;
     try {
-      // TODO: Load once.
-      const categories = yield this.api.categories(this.token as Token);
       const overall = yield this.api.appOverall(this.token as Token);
-      this.categories = categories;
       this.cards = overall.result.cards;
       this.personalData = overall.result.personalData;
     } catch (e) {
@@ -98,7 +103,7 @@ export class RootStore {
     } finally {
       this.loading = false;
     }
-    this.selectedCard = this.cards[0].uid;
+    this.changeCard(this.cards[0].uid);
   });
 
   getOTP = flow(function *(this: RootStore, phone: string) {
@@ -170,6 +175,12 @@ export class RootStore {
   @action
   setCode(code: string) {
     this.code = code;
+  }
+
+  @action
+  changeCard(uid: string) {
+    this.selectedCard = uid;
+    this.statement = undefined;
   }
 
   @computed

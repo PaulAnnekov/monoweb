@@ -28,7 +28,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
   }
 
   private loadTransactions() {
-    this.props.store.getTransactions(this.props.store.selectedCard);
+    this.props.store.getTransactions();
   }
 
   render() {
@@ -60,16 +60,20 @@ export default class extends React.Component<{store: RootStore}, {}> {
         </div>
       );
     })
+    const isEmpty = store.statement && !store.statement.operations.length;
 
     return (
       <div className={s.statement}>
+      {/* TODO: Localize. */}
+      {isEmpty && <div className={s.empty}>Нічого немає 🤷</div>}
       {!store.error && store.selectedCard &&
         <div className={s.list}>
           <InfiniteScroll
             pageStart={0}
             loadMore={() => this.loadTransactions()}
             hasMore={!store.statement || !store.statement.isFull}
-            loader={<div className={s.loader} key={0}>Загрузка...</div>}
+            // TODO: Localize.
+            loader={<div className={s.loader} key={0}>Завантаження...</div>}
             useWindow={false}
           >
             {list}
