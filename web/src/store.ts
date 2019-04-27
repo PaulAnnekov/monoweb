@@ -30,6 +30,10 @@ function getToken(): Token | undefined {
 
 export class RootStore {
   @observable token = getToken();
+  /**
+   * Companion of token.isExpired() but for cases when we got HTTP error.
+   */
+  @observable isTokenExpiredError = false;
   @observable phone = '';
   @observable otp = false;
   @observable code = '';
@@ -86,6 +90,15 @@ export class RootStore {
         this.statement.operations.push(...statement.panStatement.listStmt);
       }
     } catch (e) {
+      // TODO: Make a separate algorithm to check this for any request after
+      // authorization.
+      // Most likely 5 minutes passed and access_token expired.
+      if (e instanceof APIError && e.status == 401) {
+        this.resetUserData();
+        this.isTokenExpiredError = true;
+        this.error = 'Час сесії вийшов, увійдіть заново';
+        return;
+      }
       this.error = e.toString();
     }
   });
@@ -170,6 +183,10 @@ export class RootStore {
     } finally {
       this.loading = false;
     }
+    // Reset authorization-related state after successful auth to don't reuse
+    // it when access_token will be invalidated and we will return back to
+    // authorization.
+    this.resetAuthData();
   });
 
   @action
@@ -183,9 +200,32 @@ export class RootStore {
     this.statement = undefined;
   }
 
+  @action
+  resetUserData() {
+    this.personalData = undefined;
+    this.cards = undefined;
+    this.statement = undefined;
+    this.categories = undefined;
+    this.selectedCard = undefined;
+  }
+
+  @action
+  resetAuthData() {
+    this.code = '';
+    this.pin = '';
+    this.phone = '';
+    this.otp = false;
+    this.isTokenExpiredError = false;
+  }
+
   @computed
   get hasGrantData() {
     return this.code && this.phone || this.token;
+  }
+
+  @computed
+  get isTokenExpired() {
+    return this.token && (this.token.isExpired() || this.isTokenExpiredError);
   }
 }
 
