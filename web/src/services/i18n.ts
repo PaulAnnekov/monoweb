@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import ru from '../locales/ru.json';
 import i18next from 'i18next';
-import { Language } from '../types/index.js';
+import { Language } from '../types';
 
 i18n
   .use(initReactI18next)
