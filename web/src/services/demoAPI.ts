@@ -1,6 +1,7 @@
 import API, { APIError } from "./api";
 import { IToken, IKeys, IOverall, ICategory, IStatement } from "./api/types";
 import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from "../types";
+import { t } from "./i18n";
 
 export default class DemoAPI extends API {
   private handle<T>(data: T | APIError): Promise<T> {
@@ -110,7 +111,7 @@ export default class DemoAPI extends API {
         category: '21',
         ccy: '980',
         debit: false,
-        descr: 'Нарахування відсотків за лютий',
+        descr: t('Нарахування відсотків за лютий'),
         id: '1',
         rest: 128.2,
         dateTime: '2019-03-01T09:15:14.000+02:00',

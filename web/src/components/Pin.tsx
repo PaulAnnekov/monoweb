@@ -4,12 +4,10 @@ import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
 import * as s from './Pin.scss';
-import Auth from './Auth';
-import { observe } from 'mobx';
-import { SyntheticInputEvent } from 'react-number-format';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-export default class extends React.Component<{store: RootStore}, {}> {
+class Pin extends React.Component<{store: RootStore} & WithTranslation, {}> {
   private pinRef = React.createRef<HTMLInputElement>();
 
   componentDidUpdate() {
@@ -32,7 +30,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
 
     return (
       <div className={s["pin-view"]}>
-        <div className="title">Введите ПИН-код</div>
+        <div className="title">{this.props.t('Введіть ПІН-код')}</div>
         <input autoFocus
           ref={this.pinRef}
           className={s.pin}
@@ -46,3 +44,5 @@ export default class extends React.Component<{store: RootStore}, {}> {
     );
   }
 }
+
+export default withTranslation()(Pin);

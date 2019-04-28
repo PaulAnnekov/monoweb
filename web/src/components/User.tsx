@@ -1,27 +1,35 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../store';
+import store, { RootStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
 import * as s from './User.scss';
 import { moneyFormat, currency } from '../services/utils';
-import { Card } from '../types';
+import { Card, Language } from '../types';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-export default class extends React.Component<{store: RootStore}, {}> {
+class User extends React.Component<{store: RootStore} & WithTranslation, {}> {
   componentDidMount() {
     this.props.store.getPersonalData();
   }
 
   getCardName(card: Card) {
-    // TODO: Translate.
     const names = {
-      980: 'Гривнева',
-      840: 'Доларова',
-      978: 'Єврова',
+      980: this.props.t('Гривнева'),
+      840: this.props.t('Доларова'),
+      978: this.props.t('Єврова'),
     };
 
     return names[card.currency];
+  }
+
+  getUserName() {
+    if (store.language == Language.ru) {
+      return store.personalData.fullNameRu;
+    } else {
+      return store.personalData.fullNameUk;
+    }
   }
 
   onCardChange(uid: string) {
@@ -55,7 +63,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
       {store.personalData &&
         <div className={s["user-info"]}>
           <img className={s.photo} src={store.personalData.photoAbsoluteUrl} />
-          <div className="name">{store.personalData.fullNameUk}</div>
+          <div className="name">{this.getUserName()}</div>
         </div>
       }
       { store.error && <Error message={store.error} /> }
@@ -64,3 +72,5 @@ export default class extends React.Component<{store: RootStore}, {}> {
     );
   }
 }
+
+export default withTranslation()(User);

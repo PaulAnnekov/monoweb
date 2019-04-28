@@ -5,10 +5,11 @@ import Error from './Error';
 import Loader from './Loader';
 import * as s from './Auth.scss';
 import NumberFormat, { NumberFormatValues } from 'react-number-format';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-export default class Auth extends React.Component<{store: RootStore}, {phone: string; code: string}> {
-  constructor(props: {store: RootStore}) {
+class Auth extends React.Component<{store: RootStore} & WithTranslation, {phone: string; code: string}> {
+  constructor(props: {store: RootStore} & WithTranslation) {
     super(props);
 
     this.state = {
@@ -59,12 +60,12 @@ export default class Auth extends React.Component<{store: RootStore}, {phone: st
               format="### ## ### ####" />
           </div>
           { store.error && <Error message={store.error} /> }
-          <button disabled={state.phone.length !== 12 || store.loading}>Далее</button>
+          <button disabled={state.phone.length !== 12 || store.loading}>{this.props.t('Далі')}</button>
         </form>
       }
       { store.otp &&
         <div className={s['sms-wrapper']}>
-          <div className={s.title}>Введите код из СМС</div>
+          <div className={s.title}>{this.props.t('Введите код из СМС')}</div>
           <div className={s['sms-input']}>
             <NumberFormat
               className={s.sms}
@@ -84,3 +85,5 @@ export default class Auth extends React.Component<{store: RootStore}, {phone: st
     );
   }
 }
+
+export default withTranslation()(Auth);

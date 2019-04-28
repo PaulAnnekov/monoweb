@@ -1,3 +1,5 @@
+import { Language } from "../types";
+
 export function moneyFormat(num: number) {
   const formatter = new Intl.NumberFormat('en', {
     maximumFractionDigits: 2,
@@ -16,12 +18,11 @@ export function currency(ccy: string): string {
   return CURRENCIES[ccy];
 }
 
-export function getLanguage(): string {
-  const valid = ['ru', 'uk'];
+export function getLanguage(): Language {
   let lang = '';
   if (navigator.language) {
       lang = navigator.language.split('-')[0];
   }
 
-  return lang && valid.includes(lang) ? lang : 'uk';
+  return lang && Language[lang] ? Language[lang] : Language.uk;
 }

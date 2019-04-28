@@ -1,12 +1,14 @@
 import 'reflect-metadata'; // required by 'class-transformer'
 import { serialize, deserialize } from 'class-transformer';
-import { Token, PersonalData, Card } from './types';
+import { Token, PersonalData, Card, Language } from './types';
 import API, { APIError } from './services/api';
 import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
 import { ICategory, IOperation } from './services/api/types';
-import { getLanguage } from './services/utils';
+import { getLanguage as getBrowserLanguage } from './services/utils';
+import { t } from './services/i18n';
+import i18next from 'i18next';
 
 const isDemo = false;
 const tokenName = isDemo ? 'demoToken' : 'token';
@@ -29,6 +31,7 @@ function getToken(): Token | undefined {
 }
 
 export class RootStore {
+  @observable language = getBrowserLanguage();
   @observable token = getToken();
   /**
    * Companion of token.isExpired() but for cases when we got HTTP error.
@@ -57,9 +60,10 @@ export class RootStore {
           input = 'https://cors-anywhere.herokuapp.com/' + input;
           return fetch(input, init);
         },
-        language: getLanguage()
+        language: this.language,
       });
     }
+    i18next.changeLanguage(this.language);
   }
 
   getTransactions = flow(function *(this: RootStore) {
@@ -96,7 +100,7 @@ export class RootStore {
       if (e instanceof APIError && e.status == 401) {
         this.resetUserData();
         this.isTokenExpiredError = true;
-        this.error = 'Час сесії вийшов, увійдіть заново';
+        this.error = t('Час сесії вийшов, увійдіть заново');
         return;
       }
       this.error = e.toString();
@@ -151,7 +155,7 @@ export class RootStore {
         refresh_token: this.token.refreshToken,
       };
     } else {
-      this.error = 'Помилка програми';
+      this.error = t('Помилка програми') as string;
       this.loading = false;
       this.pin = '';
       return;
@@ -175,8 +179,7 @@ export class RootStore {
       if (e instanceof APIError && e.status == 400 && this.token) {
         this.token = undefined;
         resetToken();
-        // TODO: Localize.
-        this.error = 'Авторизація на цьому пристрої скинулася, увійдіть заново';
+        this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
         return;
       }
       this.error = e.toString();

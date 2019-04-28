@@ -2,11 +2,15 @@ import 'reflect-metadata'; // required by 'class-transformer'
 import { Type } from 'class-transformer';
 import { IToken } from '../services/api/types';
 
+export enum Language {
+  ru = 'ru',
+  uk = 'uk',
+}
+
 export interface PersonalData {
   id: string;
   uid: string;
   email: string;
-  fullNameEn: string;
   fullNameRu: string;
   fullNameUk: string;
   phone: string;

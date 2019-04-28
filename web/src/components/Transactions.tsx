@@ -2,14 +2,14 @@ import { observer } from 'mobx-react';
 import { RootStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
-import Loader from './Loader';
-import { moneyFormat, getLanguage } from '../services/utils';
+import { moneyFormat } from '../services/utils';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as s from './Transactions.scss';
+import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-export default class extends React.Component<{store: RootStore}, {}> {
+class Transactions extends React.Component<{store: RootStore} & WithTranslation, {}> {
   private TRANSPARENT = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
   private isSameDay(d1: Date, d2: Date): boolean {
@@ -24,7 +24,7 @@ export default class extends React.Component<{store: RootStore}, {}> {
     if (now.getFullYear() !== date.getFullYear()) {
       options.year = 'numeric';
     }
-    return date.toLocaleDateString(getLanguage(), options);
+    return date.toLocaleDateString(this.props.store.language, options);
   }
 
   private loadTransactions() {
@@ -64,16 +64,14 @@ export default class extends React.Component<{store: RootStore}, {}> {
 
     return (
       <div className={s.statement}>
-      {/* TODO: Localize. */}
-      {isEmpty && <div className={s.empty}>Нічого немає 🤷</div>}
+      {isEmpty && <div className={s.empty}>{this.props.t('Нічого немає 🤷')}</div>}
       {!store.error && store.selectedCard &&
         <div className={s.list}>
           <InfiniteScroll
             pageStart={0}
             loadMore={() => this.loadTransactions()}
             hasMore={!store.statement || !store.statement.isFull}
-            // TODO: Localize.
-            loader={<div className={s.loader} key={0}>Завантаження...</div>}
+            loader={<div className={s.loader} key={0}>{this.props.t('Завантаження…')}</div>}
             useWindow={false}
           >
             {list}
@@ -85,3 +83,5 @@ export default class extends React.Component<{store: RootStore}, {}> {
     );
   }
 }
+
+export default withTranslation()(Transactions);
