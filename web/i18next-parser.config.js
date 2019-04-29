@@ -8,4 +8,5 @@ module.exports = {
   output: 'src/locales/$LOCALE.json',
   input: ['src/**/*.{ts,tsx}'],
   sort: true,
+  keySeparator: '::',
 }

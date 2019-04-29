@@ -15,6 +15,7 @@ export class RootStore {
   @persist @observable language = getBrowserLanguage();
   @persist('object', Token) @observable token: Token;
   @persist @observable deviceID = genDeviceID();
+  @persist @observable disclaimer = false;
   /**
    * Companion of token.isExpired() but for cases when we got HTTP error.
    */

@@ -16,6 +16,11 @@ i18n
     fallbackLng: Language.uk,
     interpolation: {
       escapeValue: false // React already safes from xss.
+    },
+    keySeparator: '::',
+    saveMissing: true,
+    missingKeyHandler: (lng, ns, key) => {
+      console.warn(`Missing translation key: "${key}"`);
     }
   });
 

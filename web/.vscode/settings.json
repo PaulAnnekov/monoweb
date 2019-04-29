@@ -11,7 +11,8 @@
       "secp",
       "serializable",
       "teamthread",
-      "vuex"
+      "vuex",
+      "вебу"
     ],
     "editor.tabSize": 2,
     "editor.detectIndentation": false,
