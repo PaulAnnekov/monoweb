@@ -1,6 +1,5 @@
-import 'reflect-metadata'; // required by 'class-transformer'
-import { Type } from 'class-transformer';
 import { IToken } from '../services/api/types';
+import { serializable, date } from 'serializr';
 
 export enum Language {
   ru = 'ru',
@@ -52,13 +51,12 @@ export class Token {
         return t;
     }
 
-    public accessToken!: string;
-    public refreshToken!: string;
-    @Type(() => Date)
-    private date!: Date;
-    private expiresIn!: number;
+    @serializable public accessToken!: string;
+    @serializable public refreshToken!: string;
+    @serializable(date()) private date!: Date;
+    @serializable private expiresIn!: number;
     // Only exists for full privileged token.
-    private name?: string;
+    @serializable private name?: string;
 
     public isExpired(): boolean {
         return (Date.now() - this.date.getTime()) / 1000 >= this.expiresIn;

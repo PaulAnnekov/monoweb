@@ -9,6 +9,7 @@
       "mobx",
       "monobank",
       "secp",
+      "serializable",
       "teamthread",
       "vuex"
     ],
@@ -17,5 +18,8 @@
     "files.trimTrailingWhitespace": true,
     "files.exclude": {
       "**/*.scss.d.ts": true
+    },
+    "search.exclude": {
+      "dist/**/*": true
     }
 }

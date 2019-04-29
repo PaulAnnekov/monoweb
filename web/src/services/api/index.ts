@@ -32,21 +32,6 @@ function getFingerprint() {
     return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Base64);
 }
 
-function getDeviceID(): string {
-    if (!localStorage.getItem('deviceID')) {
-        // Instead ANDROID_ID (64 bit in hex) + WiFi MAC (XX:XX:XX:XX:XX:XX).
-        const id = CryptoJS.lib.WordArray.random(8).toString();
-        // https://stackoverflow.com/a/24621956/782599
-        const mac = 'XX:XX:XX:XX:XX:XX'.replace(/X/g, () => {
-            return '0123456789ABCDEF'.charAt(Math.floor(Math.random() * 16));
-        });
-        const sha1 = CryptoJS.SHA1(id + mac);
-        localStorage.setItem('deviceID', sha1.toString().toUpperCase());
-    }
-
-    return localStorage.getItem('deviceID') as string;
-}
-
 function getDeviceName(): string {
     // TODO: Try to use browser vendor + name instead.
     const device = 'Huawei P30Pro';
@@ -59,17 +44,19 @@ function getAppVersion(): string {
 }
 
 export default class API {
+  private deviceID: string;
   private fetch: typeof window.fetch;
   private language: string;
 
-  constructor(options?: {fetch?: typeof window.fetch, language?: string}) {
+  constructor(deviceID: string, options?: {fetch?: typeof window.fetch, language?: string}) {
     options = options||{};
+    this.deviceID = deviceID;
     this.fetch = options.fetch || window.fetch;
     this.language = options.language || 'uk';
   }
 
   private async api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
-    headers['Device-Id'] = getDeviceID();
+    headers['Device-Id'] = this.deviceID;
     headers['Device-Name'] = getDeviceName();
     headers['App-Version'] = getAppVersion();
     headers.Lang = this.language;

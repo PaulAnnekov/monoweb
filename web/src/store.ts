@@ -1,38 +1,20 @@
-import 'reflect-metadata'; // required by 'class-transformer'
-import { serialize, deserialize } from 'class-transformer';
 import { Token, PersonalData, Card, Language } from './types';
 import API, { APIError } from './services/api';
 import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
 import { ICategory, IOperation } from './services/api/types';
-import { getLanguage as getBrowserLanguage } from './services/utils';
+import { getLanguage as getBrowserLanguage, genDeviceID } from './services/utils';
 import { t } from './services/i18n';
 import i18next from 'i18next';
+import { create, persist } from 'mobx-persist';
 
 const isDemo = false;
-const tokenName = isDemo ? 'demoToken' : 'token';
-
-function saveToken(token: Token) {
-  localStorage.setItem(tokenName, serialize(token));
-}
-
-function resetToken() {
-  localStorage.removeItem(tokenName);
-}
-
-function getToken(): Token | undefined {
-  const data = localStorage.getItem(tokenName);
-  if (!data) {
-    return;
-  }
-
-  return deserialize(Token, data);
-}
 
 export class RootStore {
-  @observable language = getBrowserLanguage();
-  @observable token = getToken();
+  @persist @observable language = getBrowserLanguage();
+  @persist('object', Token) @observable token: Token;
+  @persist @observable deviceID = genDeviceID();
   /**
    * Companion of token.isExpired() but for cases when we got HTTP error.
    */
@@ -53,9 +35,9 @@ export class RootStore {
 
   constructor() {
     if (isDemo) {
-      this.api = new DemoAPI();
+      this.api = new DemoAPI(this.deviceID);
     } else {
-      this.api = new API({
+      this.api = new API(this.deviceID, {
         fetch: (input: RequestInfo, init?: RequestInit) => {
           input = 'https://cors-anywhere.herokuapp.com/' + input;
           return fetch(input, init);
@@ -171,14 +153,12 @@ export class RootStore {
         sign,
       });
       this.token = Token.fromAPI(token);
-      saveToken(this.token);
     } catch (e) {
       this.pin = '';
       // Most likely refresh_token is invalidated by logging in on another
       // device.
       if (e instanceof APIError && e.status == 400 && this.token) {
         this.token = undefined;
-        resetToken();
         this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
         return;
       }
@@ -232,4 +212,8 @@ export class RootStore {
   }
 }
 
-export default new RootStore();
+const hydrate = create({})
+const rootStore = new RootStore();
+hydrate(!isDemo ? 'monowebStorage' : 'monowebDemoStorage', rootStore)
+
+export default rootStore;
