@@ -3,11 +3,16 @@ import { RootStore } from '../store';
 import * as React from 'react';
 import * as s from './Disclaimer.scss';
 import { withTranslation, WithTranslation, Trans } from 'react-i18next';
+import Tooltip from 'rc-tooltip';
 
 @observer
 class Disclaimer extends React.Component<{store: RootStore} & WithTranslation, {}> {
   onAgree() {
     this.props.store.disclaimer = true;
+  }
+
+  onDemo() {
+
   }
 
   render() {
@@ -25,7 +30,12 @@ class Disclaimer extends React.Component<{store: RootStore} & WithTranslation, {
             <p>Використовуйте на свій страх і ризик.</p>
           </Trans>
         </div>
-        <button onClick={() => this.onAgree()}>{this.props.t('Принимаю')}</button>
+        <div className={s.buttons}>
+          <button onClick={() => this.onAgree()}>{this.props.t('Принимаю')}</button>
+          <Tooltip placement="top" overlay={this.props.t('Не хочу поки вводити свої дані, спершу спробую демо')}>
+            <button className={s.demo} onClick={() => this.onDemo()}>{this.props.t('Демо')}</button>
+          </Tooltip>
+        </div>
       </div>
     );
   }

@@ -12,6 +12,13 @@ html, body, :global(#app) {
   padding: 20px;
 }
 
+:global(.rc-tooltip-inner) {
+  padding: 3px 6px;
+  min-height: auto;
+  width: 190px;
+  text-align: justify;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #000;
