@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../store';
+import { UserStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
@@ -8,8 +8,8 @@ import NumberFormat, { NumberFormatValues } from 'react-number-format';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-class Auth extends React.Component<{store: RootStore} & WithTranslation, {phone: string; code: string}> {
-  constructor(props: {store: RootStore} & WithTranslation) {
+class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone: string; code: string}> {
+  constructor(props: {store: UserStore} & WithTranslation) {
     super(props);
 
     this.state = {
@@ -60,12 +60,16 @@ class Auth extends React.Component<{store: RootStore} & WithTranslation, {phone:
               format="### ## ### ####" />
           </div>
           { store.error && <Error message={store.error} /> }
-          <button disabled={state.phone.length !== 12 || store.loading}>{this.props.t('Далі')}</button>
+          <button
+            className="form-button"
+            disabled={state.phone.length !== 12 || store.loading}>
+            {this.props.t('Далі')}
+          </button>
         </form>
       }
       { store.otp &&
         <div className={s['sms-wrapper']}>
-          <div className={s.title}>{this.props.t('Введите код из СМС')}</div>
+          <div className={s.title}>{this.props.t('Введіть код з СМС')}</div>
           <div className={s['sms-input']}>
             <NumberFormat
               className={s.sms}

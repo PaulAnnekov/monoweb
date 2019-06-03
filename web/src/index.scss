@@ -23,3 +23,23 @@ body {
     font-family: 'Roboto', sans-serif;
     background-color: #000;
 }
+
+:global(.form-button) {
+  border: 0;
+  outline: 0;
+  line-height: 240%;
+  font-size: 120%;
+  background-color: #fa5255;
+  color: #fff;
+  width: 100%;
+  align-self: flex-end;
+  cursor: pointer;
+
+  &:disabled {
+    background-color: #ccc;
+  }
+
+  &:enabled:hover {
+    background-color: #cc4345;
+  }
+}

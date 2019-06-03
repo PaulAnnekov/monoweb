@@ -12,4 +12,19 @@
     transform: translate(-50%, -50%);
     overflow: hidden;
   }
+
+  .demo-exit {
+    border: 0;
+    outline: 0;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 80%;
+    background-color: #fa5255;
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #cc4345;
+    }
+  }
 }

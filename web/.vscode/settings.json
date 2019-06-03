@@ -8,11 +8,16 @@
       "k",
       "mobx",
       "monobank",
+      "monoweb",
+      "quotemark",
+      "scroller",
       "secp",
       "serializable",
+      "serializr",
       "teamthread",
       "vuex",
-      "вебу"
+      "вебу",
+      "демо"
     ],
     "editor.tabSize": 2,
     "editor.detectIndentation": false,

@@ -12,7 +12,7 @@ class Disclaimer extends React.Component<{store: RootStore} & WithTranslation, {
   }
 
   onDemo() {
-
+    this.props.store.toggleDemo();
   }
 
   render() {
@@ -31,9 +31,9 @@ class Disclaimer extends React.Component<{store: RootStore} & WithTranslation, {
           </Trans>
         </div>
         <div className={s.buttons}>
-          <button onClick={() => this.onAgree()}>{this.props.t('Принимаю')}</button>
+          <button className="form-button" onClick={() => this.onAgree()}>{this.props.t('Приймаю')}</button>
           <Tooltip placement="top" overlay={this.props.t('Не хочу поки вводити свої дані, спершу спробую демо')}>
-            <button className={s.demo} onClick={() => this.onDemo()}>{this.props.t('Демо')}</button>
+            <button className={'form-button ' + s.demo} onClick={() => this.onDemo()}>{this.props.t('Демо')}</button>
           </Tooltip>
         </div>
       </div>

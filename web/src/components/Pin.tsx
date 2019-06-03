@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../store';
+import { UserStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
@@ -7,7 +7,7 @@ import * as s from './Pin.scss';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-class Pin extends React.Component<{store: RootStore} & WithTranslation, {}> {
+class Pin extends React.Component<{store: UserStore} & WithTranslation, {}> {
   private pinRef = React.createRef<HTMLInputElement>();
 
   componentDidUpdate() {
@@ -29,7 +29,7 @@ class Pin extends React.Component<{store: RootStore} & WithTranslation, {}> {
     const store = this.props.store;
 
     return (
-      <div className={s["pin-view"]}>
+      <div className={s['pin-view']}>
         <div className="title">{this.props.t('Введіть ПІН-код')}</div>
         <input autoFocus
           ref={this.pinRef}

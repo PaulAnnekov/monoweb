@@ -9,13 +9,10 @@ import { t } from './services/i18n';
 import i18next from 'i18next';
 import { create, persist } from 'mobx-persist';
 
-const isDemo = false;
-
-export class RootStore {
+export class UserStore {
   @persist @observable language = getBrowserLanguage();
   @persist('object', Token) @observable token: Token;
   @persist @observable deviceID = genDeviceID();
-  @persist @observable disclaimer = false;
   /**
    * Companion of token.isExpired() but for cases when we got HTTP error.
    */
@@ -32,32 +29,15 @@ export class RootStore {
   @observable categories: ICategory[];
   @observable selectedCard: string;
 
-  private api: API;
-
-  constructor() {
-    if (isDemo) {
-      this.api = new DemoAPI(this.deviceID);
-    } else {
-      this.api = new API(this.deviceID, {
-        fetch: (input: RequestInfo, init?: RequestInit) => {
-          input = 'https://cors-anywhere.herokuapp.com/' + input;
-          return fetch(input, init);
-        },
-        language: this.language,
-      });
-    }
-    i18next.changeLanguage(this.language);
-  }
-
-  getTransactions = flow(function *(this: RootStore) {
+  getTransactions = flow(function *(this: UserStore) {
     this.error = false;
     try {
       if (!this.categories) {
         const categories = yield this.api.categories(this.token as Token);
         this.categories = categories;
       }
-      let lastStatement = this.statement && this.statement.operations.length &&
-        this.statement.operations[this.statement.operations.length-1];
+      const lastStatement = this.statement && this.statement.operations.length
+        && this.statement.operations[this.statement.operations.length - 1];
       const statement = yield this.api.cardStatement(
         this.token as Token,
         this.selectedCard,
@@ -80,7 +60,7 @@ export class RootStore {
       // TODO: Make a separate algorithm to check this for any request after
       // authorization.
       // Most likely 5 minutes passed and access_token expired.
-      if (e instanceof APIError && e.status == 401) {
+      if (e instanceof APIError && e.status === 401) {
         this.resetUserData();
         this.isTokenExpiredError = true;
         this.error = t('Час сесії вийшов, увійдіть заново');
@@ -90,7 +70,7 @@ export class RootStore {
     }
   });
 
-  getPersonalData = flow(function *(this: RootStore) {
+  getPersonalData = flow(function *(this: UserStore) {
     this.loading = true;
     this.error = false;
     try {
@@ -106,7 +86,7 @@ export class RootStore {
     this.changeCard(this.cards[0].uid);
   });
 
-  getOTP = flow(function *(this: RootStore, phone: string) {
+  getOTP = flow(function *(this: UserStore, phone: string) {
     this.loading = true;
     this.error = false;
     try {
@@ -120,7 +100,7 @@ export class RootStore {
     }
   });
 
-  auth = flow(function *(this: RootStore, pin: string) {
+  auth = flow(function *(this: UserStore, pin: string) {
     this.loading = true;
     this.error = false;
     this.pin = pin;
@@ -158,7 +138,7 @@ export class RootStore {
       this.pin = '';
       // Most likely refresh_token is invalidated by logging in on another
       // device.
-      if (e instanceof APIError && e.status == 400 && this.token) {
+      if (e instanceof APIError && e.status === 400 && this.token) {
         this.token = undefined;
         this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
         return;
@@ -172,6 +152,22 @@ export class RootStore {
     // authorization.
     this.resetAuthData();
   });
+
+  private api: API;
+
+  init(isDemo: boolean) {
+    if (isDemo) {
+      this.api = new DemoAPI(this.deviceID);
+    } else {
+      this.api = new API(this.deviceID, {
+        fetch: (input: RequestInfo, init?: RequestInit) => {
+          input = 'https://cors-anywhere.herokuapp.com/' + input;
+          return fetch(input, init);
+        },
+        language: this.language,
+      });
+    }
+  }
 
   @action
   setCode(code: string) {
@@ -213,8 +209,36 @@ export class RootStore {
   }
 }
 
-const hydrate = create({})
-const rootStore = new RootStore();
-hydrate(!isDemo ? 'monowebStorage' : 'monowebDemoStorage', rootStore)
+export class RootStore {
+  @persist @observable isDemo = false;
+  @persist @observable disclaimer = false;
+  @persist('object', UserStore) @observable userStore = new UserStore();
+  @persist('object', UserStore) @observable demoUserStore = new UserStore();
 
-export default rootStore;
+  init() {
+    this.userStore.init(false);
+    this.demoUserStore.init(true);
+    i18next.changeLanguage(this.currentUserStore.language);
+  }
+
+  @computed
+  get currentUserStore() {
+    return this.isDemo ? this.demoUserStore : this.userStore;
+  }
+
+  @action
+  toggleDemo() {
+    this.isDemo = !this.isDemo;
+    i18next.changeLanguage(this.currentUserStore.language);
+  }
+}
+
+const hydrate = create({});
+const rootStore = new RootStore();
+const hydration = hydrate('monowebStorage', rootStore)
+  .then(rootStore.init.bind(rootStore));
+
+export default async () => {
+  await hydration;
+  return rootStore;
+};

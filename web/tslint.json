@@ -15,5 +15,18 @@
     "object-literal-sort-keys": false,
     "no-consecutive-blank-lines": false,
     "member-access": false,
+    "max-classes-per-file": false,
+    "trailing-comma": {
+        "options": {
+            "esSpecCompliant": true,
+            "multiline": {
+              "objects": "always",
+              "arrays": "always",
+              "functions": "never",
+              "typeLiterals": "ignore"
+            },
+            "singleline": "never"
+        }
+    }
   }
 }

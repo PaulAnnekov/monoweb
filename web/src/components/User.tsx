@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import store, { RootStore } from '../store';
+import { UserStore } from '../store';
 import * as React from 'react';
 import Error from './Error';
 import Loader from './Loader';
@@ -9,7 +9,7 @@ import { Card, Language } from '../types';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-class User extends React.Component<{store: RootStore} & WithTranslation, {}> {
+class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
   componentDidMount() {
     this.props.store.getPersonalData();
   }
@@ -25,10 +25,10 @@ class User extends React.Component<{store: RootStore} & WithTranslation, {}> {
   }
 
   getUserName() {
-    if (store.language == Language.ru) {
-      return store.personalData.fullNameRu;
+    if (this.props.store.language === Language.ru) {
+      return this.props.store.personalData.fullNameRu;
     } else {
-      return store.personalData.fullNameUk;
+      return this.props.store.personalData.fullNameUk;
     }
   }
 
@@ -46,7 +46,7 @@ class User extends React.Component<{store: RootStore} & WithTranslation, {}> {
           {store.cards.map((c) => {
             return (
               <div
-                className={s['card-info'] + (c.uid == store.selectedCard ? ` ${s.selected}` : '')}
+                className={s['card-info'] + (c.uid === store.selectedCard ? ` ${s.selected}` : '')}
                 key={c.uid}
                 onClick={() => this.onCardChange(c.uid)}>
                 <div className={s.name}>
@@ -56,12 +56,12 @@ class User extends React.Component<{store: RootStore} & WithTranslation, {}> {
                   { moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       }
       {store.personalData &&
-        <div className={s["user-info"]}>
+        <div className={s['user-info']}>
           <img className={s.photo} src={store.personalData.photoAbsoluteUrl} />
           <div className="name">{this.getUserName()}</div>
         </div>
