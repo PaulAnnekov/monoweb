@@ -29,7 +29,7 @@ export class Home extends React.Component<{store: RootStore} & WithTranslation, 
 
     return (
       <div className={s.home}>
-      {!store.disclaimer && store.isDemo &&
+      {store.isDemo &&
         <button className={s['demo-exit']} onClick={() => this.onDemo()}>{this.props.t('Вийти з демо')}</button>}
       {auth ? (
         <div className={s['auth-wrapper']}>{auth}</div>
