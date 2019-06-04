@@ -1,31 +1,21 @@
-import API, { APIError } from "./api";
-import { IToken, IKeys, IOverall, ICategory, IStatement } from "./api/types";
-import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from "../types";
-import { t } from "./i18n";
+import API, { APIError } from './api';
+import { IToken, IKeys, IOverall, ICategory, IStatement } from './api/types';
+import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '../types';
+import { t } from './i18n';
 
 export default class DemoAPI extends API {
-  private handle<T>(data: T | APIError): Promise<T> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        if (data instanceof APIError) {
-          reject(data);
-        } else {
-          resolve(data);
-        }
-      }, 200);
-    });
-  }
-
   async otp(phone: string): Promise<object> {
-    return this.handle(phone === '380333333333' ? new APIError(400, {}) : {});
+    return this.handle(phone === '380333333333' ?
+      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {});
   }
 
   async token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IToken> {
-    return this.handle({
-      access_token: '1',
-      refresh_token: '1',
-      expires_in: 300,
-    });
+    return this.handle((grant as IGrantTypePassword).password === '3333' ?
+      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {
+        access_token: '1',
+        refresh_token: '1',
+        expires_in: 300,
+      });
   }
 
   async keys({ access_token }: IToken): Promise<IKeys> {
@@ -35,8 +25,9 @@ export default class DemoAPI extends API {
   }
 
   async auth({ access_token }: IToken, sign: any): Promise<IToken> {
+    // When PIN code is '3333'.
     return this.handle(sign.sign === 'zlNeflaDXzmNHjgSq1KOjTX3WQyUi9kRe8Ec54KWru0v/ywYO4CLH+6UN4O6+DXRAFb3VjEyLAr3peOOlbL+1A==' ?
-      new APIError(400, {}) : {
+      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {
         access_token: '1',
         refresh_token: '1',
         expires_in: 300,
@@ -87,7 +78,7 @@ export default class DemoAPI extends API {
       id: 21,
       names: {RU: '% на остаток', UK: '% на залишок'},
       noFin: false,
-      refused: false
+      refused: false,
     }]);
   }
 
@@ -117,7 +108,19 @@ export default class DemoAPI extends API {
         dateTime: '2019-03-01T09:15:14.000+02:00',
         tranDate: '2019-03-01T09:15:14+02:00',
         type: 'FINANCIAL',
-      }]
+      }],
     }});
+  }
+
+  private handle<T>(data: T | APIError): Promise<T> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (data instanceof APIError) {
+          reject(data);
+        } else {
+          resolve(data);
+        }
+      }, 200);
+    });
   }
 }

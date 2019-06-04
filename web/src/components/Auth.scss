@@ -31,7 +31,6 @@
 
   .sms-input {
     position: relative;
-    text-align: center;
     margin-top: 50px;
     .sms, .hint {
       font-family: 'Roboto Mono', monospace;
@@ -47,8 +46,6 @@
   }
 
   .sms-wrapper {
-    .title {
-      text-align: center;
-    }
+    text-align: center;
   }
 }

@@ -8,13 +8,12 @@ import NumberFormat, { NumberFormatValues } from 'react-number-format';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone: string; code: string}> {
+class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone: string}> {
   constructor(props: {store: UserStore} & WithTranslation) {
     super(props);
 
     this.state = {
       phone: '380',
-      code: '',
     };
   }
 
@@ -24,16 +23,19 @@ class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone:
   }
 
   get hint(): string {
-    return Array(this.state.code.length).fill(' ').concat(Array(4 - this.state.code.length).fill('_')).join('');
+    return Array(this.props.store.code.length)
+      .fill(' ')
+      .concat(Array(4 - this.props.store.code.length).fill('_'))
+      .join('');
   }
 
   onCodeChange(v: NumberFormatValues) {
-    this.setState(Object.assign(this.state, {code: v.value}));
     const code = v.value;
+    this.props.store.code = code;
     if (code.length !== 4) {
       return;
     }
-    this.props.store.setCode(code);
+    this.props.store.sms();
   }
 
   onPhoneChange(v: NumberFormatValues) {
@@ -69,12 +71,12 @@ class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone:
       }
       { store.otp &&
         <div className={s['sms-wrapper']}>
-          <div className={s.title}>{this.props.t('Введіть код з СМС')}</div>
+          <div>{this.props.t('Введіть код з СМС')}</div>
           <div className={s['sms-input']}>
             <NumberFormat
               className={s.sms}
               autoFocus
-              defaultValue={state.code}
+              value={store.code}
               onValueChange={(v) => this.onCodeChange(v)}
               disabled={store.loading}
               format="####"

@@ -9,6 +9,6 @@ import './index.scss';
 (async () => {
   const store = await getStore();
   ReactDOM.render(
-    <Home store={store} />, document.getElementById('app'),
+    <Home store={store} />, document.getElementById('app')
   );
 })();

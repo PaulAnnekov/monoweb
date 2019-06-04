@@ -3,7 +3,7 @@ import API, { APIError } from './services/api';
 import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
-import { ICategory, IOperation } from './services/api/types';
+import { ICategory, IOperation, IToken, IKeys } from './services/api/types';
 import { getLanguage as getBrowserLanguage, genDeviceID } from './services/utils';
 import { t } from './services/i18n';
 import i18next from 'i18next';
@@ -28,6 +28,8 @@ export class UserStore {
   @observable statement: {isFull: boolean, operations: IOperation[]};
   @observable categories: ICategory[];
   @observable selectedCard: string;
+  @observable tempToken: IToken;
+  @observable keys: IKeys;
 
   getTransactions = flow(function *(this: UserStore) {
     this.error = false;
@@ -100,45 +102,55 @@ export class UserStore {
     }
   });
 
-  auth = flow(function *(this: UserStore, pin: string) {
+  sms = flow(function *(this: UserStore) {
     this.loading = true;
     this.error = false;
-    this.pin = pin;
-    let grant;
-    if (this.code) {
-      grant = {
+    try {
+      this.tempToken = yield this.api.token({
         channel: 'sms',
         grant_type: 'password',
         password: this.code,
         username: this.phone,
-      };
-    } else if (this.token) {
-      grant = {
-        grant_type: 'refresh_token',
-        refresh_token: this.token.refreshToken,
-      };
-    } else {
-      this.error = t('Помилка програми') as string;
+      });
+      this.keys = yield this.api.keys(this.tempToken);
+    } catch (e) {
+      this.error = e.toString();
+    } finally {
       this.loading = false;
-      this.pin = '';
-      return;
     }
+    this.code = '';
+  });
+
+  auth = flow(function *(this: UserStore) {
+    this.loading = true;
+    this.error = false;
     try {
-      const tempToken = yield this.api.token(grant);
-      const keys = yield this.api.keys(tempToken);
+      if (this.token) {
+        this.tempToken = yield this.api.token({
+          grant_type: 'refresh_token',
+          refresh_token: this.token.refreshToken,
+        });
+        this.keys = yield this.api.keys(this.tempToken);
+      }
       // TODO: Should we support >1 keys?
-      const key = keys.keys[0];
-      const sign = crypto.gen(key.enc_key, pin, tempToken.access_token);
-      const token = yield this.api.auth(tempToken, {
+      const key = this.keys.keys[0];
+      const sign = crypto.gen(key.enc_key, this.pin, this.tempToken.access_token);
+      const token = yield this.api.auth(this.tempToken, {
         name: key.name,
         sign,
       });
       this.token = Token.fromAPI(token);
+      // Reset authorization-related state after successful auth to don't reuse
+      // it when access_token will be invalidated and we will return back to
+      // authorization.
+      this.resetAuthData();
     } catch (e) {
       this.pin = '';
       // Most likely refresh_token is invalidated by logging in on another
       // device.
       if (e instanceof APIError && e.status === 400 && this.token) {
+        this.tempToken = null;
+        this.keys = null;
         this.token = undefined;
         this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
         return;
@@ -147,10 +159,6 @@ export class UserStore {
     } finally {
       this.loading = false;
     }
-    // Reset authorization-related state after successful auth to don't reuse
-    // it when access_token will be invalidated and we will return back to
-    // authorization.
-    this.resetAuthData();
   });
 
   private api: API;
@@ -167,11 +175,6 @@ export class UserStore {
         language: this.language,
       });
     }
-  }
-
-  @action
-  setCode(code: string) {
-    this.code = code;
   }
 
   @action
@@ -194,13 +197,15 @@ export class UserStore {
     this.code = '';
     this.pin = '';
     this.phone = '';
+    this.keys = null;
+    this.tempToken = null;
     this.otp = false;
     this.isTokenExpiredError = false;
   }
 
   @computed
   get hasGrantData() {
-    return this.code && this.phone || this.token;
+    return this.tempToken && this.keys || this.token;
   }
 
   @computed

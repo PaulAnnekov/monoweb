@@ -22,7 +22,7 @@ class Pin extends React.Component<{store: UserStore} & WithTranslation, {}> {
     if (pin.length !== 4) {
       return;
     }
-    this.props.store.auth(pin);
+    this.props.store.auth();
   }
 
   render() {
