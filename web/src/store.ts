@@ -6,6 +6,7 @@ import DemoAPI from './services/demoAPI';
 import { ICategory, IOperation, IToken, IKeys } from './services/api/types';
 import { getLanguage as getBrowserLanguage, genDeviceID } from './services/utils';
 import { t } from './services/i18n';
+import config from './config';
 import i18next from 'i18next';
 import { create, persist } from 'mobx-persist';
 
@@ -153,7 +154,7 @@ export class UserStore {
     } else {
       this.api = new API(this.deviceID, {
         fetch: (input: RequestInfo, init?: RequestInit) => {
-          input = 'https://cors-anywhere.herokuapp.com/' + input;
+          input = config.corsURL(encodeURIComponent(input as string));
           return fetch(input, init);
         },
         language: this.language,
