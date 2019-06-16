@@ -1,8 +1,10 @@
 import * as CryptoJS from 'crypto-js';
 import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '../../types';
 import { IToken, ICategory, IKeys, IOverall, IStatement } from './types';
+import { UAParser } from 'ua-parser-js';
 
 const PLATFORM = 'android';
+const PLATFORM_VERSION = '9(28)';
 const APP_VERSION_NAME = '1.21.4';
 const APP_VERSION_CODE = '1012';
 
@@ -18,6 +20,11 @@ interface MainAPIErrorInfo {
   path: string;
   status: number;
   timestamp: string;
+}
+
+interface APIOptions {
+  fetch?: typeof window.fetch;
+  language?: string;
 }
 
 export class APIError extends Error {
@@ -102,10 +109,21 @@ export class PkiAPIError extends APIError {
 }
 
 function getDeviceName(): string {
-    // TODO: Try to use browser vendor + name instead.
-    const device = 'Huawei P30Pro';
-    const androidVersion = '9(28)';
-    return `${device}, ${androidVersion}, ${APP_VERSION_NAME}(${APP_VERSION_CODE})`;
+  // Top browsers in Ukraine according to statcounter.
+  const VENDORS = {
+    Chrome: 'Google',
+    Firefox: 'Mozilla',
+    Safari: 'Apple',
+    Opera: 'Opera',
+    IE: 'Microsoft',
+    Edge: 'Microsoft',
+    Yandex: 'Yandex',
+  };
+  const uaParser = new UAParser();
+  const browser = uaParser.getBrowser().name;
+  const vendor = VENDORS[browser];
+  const device = browser && vendor ? `${vendor} ${browser}` : 'Unknown Browser';
+  return `${device}, ${PLATFORM_VERSION}, ${APP_VERSION_NAME}(${APP_VERSION_CODE})`;
 }
 
 function getAppVersion(): string {
@@ -117,7 +135,7 @@ export default class API {
   private fetch: typeof window.fetch;
   private language: string;
 
-  constructor(deviceID: string, options?: {fetch?: typeof window.fetch, language?: string}) {
+  constructor(deviceID: string, options?: APIOptions) {
     options = options || {};
     this.deviceID = deviceID;
     this.fetch = options.fetch || window.fetch;
