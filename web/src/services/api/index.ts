@@ -101,13 +101,6 @@ export class PkiAPIError extends APIError {
   }
 }
 
-function getFingerprint() {
-    // TODO: Generate real fingerprint, not total random.
-    const length = Math.floor(Math.random() * (500 - 400)) + 400;
-    // @ts-ignore
-    return CryptoJS.lib.WordArray.random(length).toString(CryptoJS.enc.Base64);
-}
-
 function getDeviceName(): string {
     // TODO: Try to use browser vendor + name instead.
     const device = 'Huawei P30Pro';
@@ -131,11 +124,11 @@ export default class API {
     this.language = options.language || 'uk';
   }
 
-  // Sends OTP request.
+  /**
+   * Sends OTP request.
+   */
   async otp(phone: string): Promise<object> {
-      return this.pkiAPI('otp', {
-          Fingerprint: getFingerprint(),
-      }, {
+      return this.pkiAPI('otp', {}, {
           channel: 'sms',
           phone,
       });
@@ -145,43 +138,29 @@ export default class API {
    * Gets restricted access token.
    */
   async token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IToken> {
-      return this.pkiAPI('token', {
-          Fingerprint: getFingerprint(),
-      }, grant);
+      return this.pkiAPI('token', {}, grant);
   }
 
   /**
    * Gets encryption keys.
    */
   async keys({ access_token }: IToken): Promise<IKeys> {
-      return this.pkiAPI('keys', {
-          Authorization: `Bearer ${access_token}`,
-          Fingerprint: getFingerprint(),
-      });
+      return this.pkiAPI('keys', {Authorization: `Bearer ${access_token}`});
   }
 
   /**
    * Gets full permissions access token.
    */
   async auth({ access_token }: IToken, sign: any): Promise<IToken> {
-      return this.pkiAPI('auth', {
-          Authorization: `Bearer ${access_token}`,
-          Fingerprint: getFingerprint(),
-      }, {
-          auth: [sign],
-      });
+      return this.pkiAPI('auth', {Authorization: `Bearer ${access_token}`}, {auth: [sign]});
   }
 
   async appOverall({ accessToken }: Token): Promise<IOverall> {
-      return this.mainAPI('app-overall', {
-          Authorization: `Bearer ${accessToken}`,
-      });
+      return this.mainAPI('app-overall', {Authorization: `Bearer ${accessToken}`});
   }
 
   async categories({ accessToken }: Token): Promise<ICategory[]> {
-    const res = await this.mainAPI('statement/categories', {
-        Authorization: `Bearer ${accessToken}`,
-    });
+    const res = await this.mainAPI('statement/categories', {Authorization: `Bearer ${accessToken}`});
     return res.result.dc;
   }
 
@@ -196,9 +175,7 @@ export default class API {
     };
     const url = new URL(`http://doesnt.matter/card/${uid}/statement`);
     Object.keys(query).forEach((key) => query[key] !== undefined && url.searchParams.append(key, query[key]));
-    return this.mainAPI(url.pathname.slice(1) + url.search, {
-        Authorization: `Bearer ${accessToken}`,
-    });
+    return this.mainAPI(url.pathname.slice(1) + url.search, {Authorization: `Bearer ${accessToken}`});
   }
 
   private async api(url: string, headers: { [key: string]: string } = {}, body?: {}) {
