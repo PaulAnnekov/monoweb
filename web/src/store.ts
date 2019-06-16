@@ -117,10 +117,12 @@ export class UserStore {
     this.error = false;
     try {
       if (this.token) {
-        this.tempToken = yield this.api.token({
-          grant_type: 'refresh_token',
-          refresh_token: this.token.refreshToken,
-        });
+        if (!this.tempToken) {
+          this.tempToken = yield this.api.token({
+            grant_type: 'refresh_token',
+            refresh_token: this.token.refreshToken,
+          });
+        }
         this.keys = yield this.api.keys(this.tempToken);
       }
       // TODO: Should we support >1 keys?
