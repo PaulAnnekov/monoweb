@@ -1,5 +1,5 @@
-import { Token, PersonalData, Card, Language } from './types';
-import API, { APIError } from './services/api';
+import { Token, PersonalData, Card } from './types';
+import API, { MainAPIError, PkiAPIError, APIError } from './services/api';
 import * as crypto from './services/crypto';
 import {observable, computed, flow, action} from 'mobx';
 import DemoAPI from './services/demoAPI';
@@ -47,7 +47,7 @@ export class UserStore {
           direction: this.statement && 'DOWN',
           stmtId: lastStatement && lastStatement.id,
           dateFrom: lastStatement && new Date(lastStatement.dateTime),
-        },
+        }
       );
       if (!this.statement) {
         this.statement = {
@@ -59,16 +59,7 @@ export class UserStore {
         this.statement.operations.push(...statement.panStatement.listStmt);
       }
     } catch (e) {
-      // TODO: Make a separate algorithm to check this for any request after
-      // authorization.
-      // Most likely 5 minutes passed and access_token expired.
-      if (e instanceof APIError && e.status === 401) {
-        this.resetUserData();
-        this.isTokenExpiredError = true;
-        this.error = t('Час сесії вийшов, увійдіть заново');
-        return;
-      }
-      this.error = e.toString();
+      this.processAPIError(e);
     }
   });
 
@@ -80,7 +71,7 @@ export class UserStore {
       this.cards = overall.result.cards;
       this.personalData = overall.result.personalData;
     } catch (e) {
-      this.error = e.toString();
+      this.processAPIError(e);
       return;
     } finally {
       this.loading = false;
@@ -96,7 +87,7 @@ export class UserStore {
       this.otp = true;
       this.phone = phone;
     } catch (e) {
-      this.error = e.toString();
+      this.processAPIError(e);
     } finally {
       this.loading = false;
     }
@@ -114,7 +105,7 @@ export class UserStore {
       });
       this.keys = yield this.api.keys(this.tempToken);
     } catch (e) {
-      this.error = e.toString();
+      this.processAPIError(e);
     } finally {
       this.loading = false;
     }
@@ -146,16 +137,7 @@ export class UserStore {
       this.resetAuthData();
     } catch (e) {
       this.pin = '';
-      // Most likely refresh_token is invalidated by logging in on another
-      // device.
-      if (e instanceof APIError && e.status === 400 && this.token) {
-        this.tempToken = null;
-        this.keys = null;
-        this.token = undefined;
-        this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
-        return;
-      }
-      this.error = e.toString();
+      this.processAPIError(e);
     } finally {
       this.loading = false;
     }
@@ -211,6 +193,26 @@ export class UserStore {
   @computed
   get isTokenExpired() {
     return this.token && (this.token.isExpired() || this.isTokenExpiredError);
+  }
+
+  private processAPIError(e: Error) {
+    if (e instanceof APIError) {
+      console.error(e.verbose());
+    }
+    if (e instanceof MainAPIError && e.isInvalidToken()) {
+      this.resetUserData();
+      this.isTokenExpiredError = true;
+      this.error = t('Час сесії вийшов, увійдіть заново');
+      return;
+    }
+    if (e instanceof PkiAPIError && this.token && e.isInvalidToken()) {
+      this.tempToken = null;
+      this.keys = null;
+      this.token = undefined;
+      this.error = t('Авторизація на цьому пристрої скинулася, увійдіть заново');
+      return;
+    }
+    this.error = e.toString();
   }
 }
 

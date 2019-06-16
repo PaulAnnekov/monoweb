@@ -1,4 +1,4 @@
-import API, { APIError } from './api';
+import API, { MainAPIError, PkiAPIError, APIError } from './api';
 import { IToken, IKeys, IOverall, ICategory, IStatement } from './api/types';
 import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '../types';
 import { t } from './i18n';
@@ -6,12 +6,20 @@ import { t } from './i18n';
 export default class DemoAPI extends API {
   async otp(phone: string): Promise<object> {
     return this.handle(phone === '380333333333' ?
-      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {});
+      new PkiAPIError(400, {
+        errCode: 'INVALID_PHONE',
+        errText: 'Эта комбинация используется для теста ошибок',
+        errType: 'toast',
+      }) : {});
   }
 
   async token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IToken> {
     return this.handle((grant as IGrantTypePassword).password === '3333' ?
-      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {
+      new PkiAPIError(400, {
+        errCode: 'INVALID_PASSWORD',
+        errText: 'Эта комбинация используется для теста ошибок',
+        errType: 'toast',
+      }) : {
         access_token: '1',
         refresh_token: '1',
         expires_in: 300,
@@ -27,7 +35,11 @@ export default class DemoAPI extends API {
   async auth({ access_token }: IToken, sign: any): Promise<IToken> {
     // When PIN code is '3333'.
     return this.handle(sign.sign === 'zlNeflaDXzmNHjgSq1KOjTX3WQyUi9kRe8Ec54KWru0v/ywYO4CLH+6UN4O6+DXRAFb3VjEyLAr3peOOlbL+1A==' ?
-      new APIError(400, {error: 'Эта комбинация используется для теста ошибок'}) : {
+      new PkiAPIError(400, {
+        errCode: 'INVALID_PIN',
+        errText: 'Эта комбинация используется для теста ошибок',
+        errType: 'toast',
+      }) : {
         access_token: '1',
         refresh_token: '1',
         expires_in: 300,
@@ -112,7 +124,7 @@ export default class DemoAPI extends API {
     }});
   }
 
-  private handle<T>(data: T | APIError): Promise<T> {
+  private handle<T>(data: T | MainAPIError | PkiAPIError): Promise<T> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (data instanceof APIError) {

@@ -16,6 +16,7 @@
     "no-consecutive-blank-lines": false,
     "member-access": false,
     "max-classes-per-file": false,
+    "no-console": false,
     "trailing-comma": {
         "options": {
             "esSpecCompliant": true,
