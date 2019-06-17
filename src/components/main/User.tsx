@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react';
-import { UserStore } from '../store';
+import { UserStore } from '../../store';
 import * as React from 'react';
-import Error from './Error';
-import Loader from './Loader';
+import Error from '../common/Error';
+import Loader from '../common/Loader';
 import * as s from './User.scss';
-import { moneyFormat, currency } from '../services/utils';
-import { Card, Language } from '../types';
+import { moneyFormat, currency } from '../../services/utils';
+import { Card, Language } from '../../types';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer

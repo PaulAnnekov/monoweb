@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
-import { UserStore } from '../store';
+import { UserStore } from '../../store';
 import * as React from 'react';
-import Error from './Error';
-import { moneyFormat } from '../services/utils';
+import Error from '../common/Error';
+import { moneyFormat } from '../../services/utils';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as s from './Transactions.scss';

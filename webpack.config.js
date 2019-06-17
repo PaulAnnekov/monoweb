@@ -26,9 +26,6 @@ module.exports = {
   ],
   module: {
     rules: [{
-      test: /\.tsx?$/,
-      loader: 'ts-loader',
-    }, {
       test: /\.css$/,
       use: ['style-loader', 'css-loader']
     }, {
@@ -49,6 +46,9 @@ module.exports = {
           options: {sourceMap: true}
         }
       ]
+    }, {
+      test: /\.tsx?$/,
+      loader: 'ts-loader',
     }]
   }
 };

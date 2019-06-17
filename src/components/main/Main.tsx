@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { UserStore } from '../store';
+import { UserStore } from '../../store';
 import * as React from 'react';
 import * as s from './Main.scss';
 import Transactions from './Transactions';

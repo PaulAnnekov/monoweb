@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
-import { UserStore } from '../store';
+import { UserStore } from '../../store';
 import * as React from 'react';
-import Error from './Error';
-import Loader from './Loader';
+import Error from '../common/Error';
+import Loader from '../common/Loader';
 import * as s from './Auth.scss';
 import NumberFormat, { NumberFormatValues } from 'react-number-format';
 import { withTranslation, WithTranslation } from 'react-i18next';

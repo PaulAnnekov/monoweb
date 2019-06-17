@@ -1,15 +1,15 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../store';
+import { RootStore } from '../../store';
 import * as React from 'react';
-import Auth from '../components/Auth';
-import Pin from '../components/Pin';
-import Main from '../components/Main';
-import * as s from './Home.scss';
-import Disclaimer from '../components/Disclaimer';
+import Auth from '../auth/Auth';
+import Pin from '../auth/Pin';
+import Main from '../main/Main';
+import * as s from './Root.scss';
+import Disclaimer from '../disclaimer/Disclaimer';
 import { withTranslation, WithTranslation } from 'react-i18next';
 
 @observer
-export class Home extends React.Component<{store: RootStore} & WithTranslation, {}> {
+export class Root extends React.Component<{store: RootStore} & WithTranslation, {}> {
   onDemo() {
     this.props.store.toggleDemo();
   }
@@ -41,4 +41,4 @@ export class Home extends React.Component<{store: RootStore} & WithTranslation, 
   }
 }
 
-export default withTranslation()(Home);
+export default withTranslation()(Root);
