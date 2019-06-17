@@ -1,4 +1,6 @@
-var path = require('path');
+const path = require('path');
+const config = require('./config.json');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   devServer: {
@@ -14,6 +16,14 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      filename: 'index.html',
+      template: 'src/index.html',
+      inject: false,
+      config
+    })
+  ],
   module: {
     rules: [{
       test: /\.tsx?$/,

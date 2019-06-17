@@ -19,11 +19,11 @@ export class Home extends React.Component<{store: RootStore} & WithTranslation, 
     const userStore = store.currentUserStore;
 
     let auth;
-    if (!store.disclaimer && !store.isDemo) {
+    if (store.disclaimerView) {
       auth = <Disclaimer store={store} />;
-    } else if (!userStore.token && !userStore.hasGrantData) {
+    } else if (store.authView) {
       auth = <Auth store={userStore} />;
-    } else if (userStore.token && userStore.isTokenExpired || !userStore.token && userStore.hasGrantData) {
+    } else if (store.pinView) {
       auth = <Pin store={userStore} />;
     }
 

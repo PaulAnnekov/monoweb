@@ -1,2 +1,5 @@
+dist/bundle.js
+dist/index.html
+config.json
 node_modules
 *.scss.d.ts

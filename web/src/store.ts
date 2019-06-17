@@ -1,12 +1,12 @@
 import { Token, PersonalData, Card } from './types';
 import API, { MainAPIError, PkiAPIError, APIError } from './services/api';
 import * as crypto from './services/crypto';
-import {observable, computed, flow, action} from 'mobx';
+import {observable, computed, flow, action, autorun} from 'mobx';
 import DemoAPI from './services/demoAPI';
 import { ICategory, IOperation, IToken, IKeys } from './services/api/types';
-import { getLanguage as getBrowserLanguage, genDeviceID } from './services/utils';
+import { getLanguage as getBrowserLanguage, genDeviceID, sha1 } from './services/utils';
 import { t } from './services/i18n';
-import config from './config';
+import config from '../config.json';
 import i18next from 'i18next';
 import { create, persist } from 'mobx-persist';
 
@@ -154,7 +154,7 @@ export class UserStore {
     } else {
       this.api = new API(this.deviceID, {
         fetch: (input: RequestInfo, init?: RequestInit) => {
-          input = config.corsURL(encodeURIComponent(input as string));
+          input = config.CORS_PROXY.replace('{url}', encodeURIComponent(input as string));
           return fetch(input, init);
         },
         language: this.language,
@@ -229,6 +229,7 @@ export class RootStore {
     this.userStore.init(false);
     this.demoUserStore.init(true);
     i18next.changeLanguage(this.currentUserStore.language);
+    autorun(this.trackNavigation.bind(this));
   }
 
   @computed
@@ -236,10 +237,52 @@ export class RootStore {
     return this.isDemo ? this.demoUserStore : this.userStore;
   }
 
+  @computed
+  get disclaimerView() {
+    return !this.disclaimer && !this.isDemo;
+  }
+
+  @computed
+  get authView() {
+    const userStore = this.currentUserStore;
+    return !this.disclaimerView && !userStore.token && !userStore.hasGrantData;
+  }
+
+  @computed
+  get pinView() {
+    const userStore = this.currentUserStore;
+    return userStore.token && userStore.isTokenExpired || !userStore.token && userStore.hasGrantData;
+  }
+
+  @computed
+  get mainView() {
+    return !this.disclaimerView && !this.authView && !this.pinView;
+  }
+
   @action
   toggleDemo() {
     this.isDemo = !this.isDemo;
     i18next.changeLanguage(this.currentUserStore.language);
+  }
+
+  private trackNavigation() {
+    const userStore = this.currentUserStore;
+    // For privacy don't store original monobank user ID.
+    ga('set', 'userId', userStore.personalData ? sha1(userStore.personalData.id) : null);
+    const views = {
+      '/disclaimer': this.disclaimerView,
+      '/auth': this.authView,
+      '/auth/pin': this.pinView,
+      '/': this.mainView,
+    };
+    Object.entries(views).some(([view, isCurrent]) => {
+      if (!isCurrent) {
+        return;
+      }
+      ga('set', 'page', view);
+      ga('send', 'pageview');
+      return true;
+    });
   }
 }
 

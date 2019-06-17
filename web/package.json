@@ -3,12 +3,14 @@
   "version": "0.0.1",
   "scripts": {
     "start": "webpack-dev-server",
+    "build": "webpack",
     "trans": "i18next --config i18next-parser.config.js"
   },
   "author": "Paul Annekov",
   "devDependencies": {
     "@types/crypto-js": "3.1.43",
     "@types/elliptic": "6.4.6",
+    "@types/google.analytics": "0.0.40",
     "@types/rc-tooltip": "3.7.1",
     "@types/react-dom": "16.8.4",
     "@types/react-input-mask": "2.0.1",
@@ -17,6 +19,7 @@
     "acorn-jsx": "4.1.1",
     "css-loader": "2.1.1",
     "css-modules-typescript-loader": "2.0.0",
+    "html-webpack-plugin": "3.2.0",
     "i18next-parser": "1.0.0-beta34",
     "node-sass": "4.12.0",
     "sass-loader": "7.1.0",

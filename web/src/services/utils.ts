@@ -35,6 +35,9 @@ export function genDeviceID(): string {
   const mac = "XX:XX:XX:XX:XX:XX".replace(/X/g, function() {
       return "0123456789ABCDEF".charAt(Math.floor(Math.random() * 16))
   });
-  const sha1 = CryptoJS.SHA1(id + mac);
-  return sha1.toString().toUpperCase();
+  return sha1(id + mac).toUpperCase();
+}
+
+export function sha1(input: string) {
+  return CryptoJS.SHA1(input).toString();
 }

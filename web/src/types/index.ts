@@ -7,7 +7,9 @@ export enum Language {
 }
 
 export interface PersonalData {
+  // 10 digits.
   id: string;
+  // 32 uppercase alphanumeric characters, same as first card uid.
   uid: string;
   email: string;
   fullNameRu: string;
@@ -18,6 +20,7 @@ export interface PersonalData {
 
 export interface Card {
   cardNum: string;
+  // 32 uppercase alphanumeric characters.
   uid: string;
   currency: string;
   balance: {

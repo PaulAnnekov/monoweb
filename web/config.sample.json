@@ -1,0 +1,4 @@
+{
+  "GA_TRACKING_ID": "UA-12345678-9",
+  "CORS_PROXY": "https://api.allorigins.win/raw?url={url}"
+}
