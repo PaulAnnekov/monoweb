@@ -29,13 +29,13 @@ export class Root extends React.Component<{store: RootStore} & WithTranslation, 
 
     return (
       <div className={s.home}>
-      {store.isDemo &&
-        <button className={s['demo-exit']} onClick={() => this.onDemo()}>{this.props.t('Вийти з демо')}</button>}
-      {auth ? (
-        <div className={s['auth-wrapper']}>{auth}</div>
-      ) : (
-        <Main store={userStore} />
-      )}
+        {store.isDemo &&
+          <button className={s['demo-exit']} onClick={() => this.onDemo()}>{this.props.t('Вийти з демо')}</button>}
+        {auth ? (
+          <div className={s['auth-wrapper']}>{auth}</div>
+        ) : (
+          <Main store={userStore} />
+        )}
       </div>
     );
   }

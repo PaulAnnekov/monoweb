@@ -15,10 +15,10 @@ class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
   }
 
   getCardName(card: Card) {
-    const names = {
-      980: this.props.t('Гривнева'),
-      840: this.props.t('Доларова'),
-      978: this.props.t('Єврова'),
+    const names: {[index: string]: string} = {
+      '980': this.props.t('Гривнева'),
+      '840': this.props.t('Доларова'),
+      '978': this.props.t('Єврова'),
     };
 
     return names[card.currency];
@@ -41,33 +41,33 @@ class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
 
     return (
       <div className={s.user}>
-      {store.cards &&
-        <div className={s.cards}>
-          {store.cards.map((c) => {
-            return (
-              <div
-                className={s['card-info'] + (c.uid === store.selectedCard ? ` ${s.selected}` : '')}
-                key={c.uid}
-                onClick={() => this.onCardChange(c.uid)}>
-                <div className={s.name}>
-                  {this.getCardName(c)} <span className="number">(*{ c.cardNum.slice(-4) })</span>
+        {store.cards &&
+          <div className={s.cards}>
+            {store.cards.map((c) => {
+              return (
+                <div
+                  className={s['card-info'] + (c.uid === store.selectedCard ? ` ${s.selected}` : '')}
+                  key={c.uid}
+                  onClick={() => this.onCardChange(c.uid)}>
+                  <div className={s.name}>
+                    {this.getCardName(c)} <span className="number">(*{ c.cardNum.slice(-4) })</span>
+                  </div>
+                  <div className={s.balance}>
+                    { moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }
+                  </div>
                 </div>
-                <div className={s.balance}>
-                  { moneyFormat(c.balance.balance) } { currency(c.balance.ccy) }
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      }
-      {store.personalData &&
-        <div className={s['user-info']}>
-          <img className={s.photo} src={store.personalData.photoAbsoluteUrl} />
-          <div className="name">{this.getUserName()}</div>
-        </div>
-      }
-      { store.error && <Error message={store.error} /> }
-      { store.loading && <Loader /> }
+              );
+            })}
+          </div>
+        }
+        {store.personalData &&
+          <div className={s['user-info']}>
+            <img className={s.photo} src={store.personalData.photoAbsoluteUrl} />
+            <div className="name">{this.getUserName()}</div>
+          </div>
+        }
+        { store.error && <Error message={store.error} /> }
+        { store.loading && <Loader /> }
       </div>
     );
   }

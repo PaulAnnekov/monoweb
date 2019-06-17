@@ -4,6 +4,7 @@
     "module": "commonjs",
     "removeComments": true,
     "experimentalDecorators": true,
+    "noImplicitAny": true,
     "jsx": "react",
     "outDir": "dist",
     "resolveJsonModule": true,

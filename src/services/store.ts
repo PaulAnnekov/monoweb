@@ -26,7 +26,7 @@ export class UserStore {
   @observable error: string | boolean;
   @observable personalData: PersonalData;
   @observable cards: Card[];
-  @observable statement: {isFull: boolean, operations: IOperation[]};
+  @observable statement: {isFull: boolean; operations: IOperation[]};
   @observable categories: ICategory[];
   @observable selectedCard: string;
   @observable tempToken: IToken;

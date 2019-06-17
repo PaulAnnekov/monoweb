@@ -38,8 +38,8 @@ class Pin extends React.Component<{store: UserStore} & WithTranslation, {}> {
           onChange={(e) => this.onCodeChange(e)}
           type="password"
           disabled={store.loading} />
-      { store.error && <Error message={store.error} /> }
-      { store.loading && <Loader /> }
+        { store.error && <Error message={store.error} /> }
+        { store.loading && <Loader /> }
       </div>
     );
   }

@@ -16,7 +16,7 @@ class Transactions extends React.Component<{store: UserStore} & WithTranslation,
   render() {
     const store = this.props.store;
     let lastDate: Date;
-    const list = [];
+    const list: JSX.Element[] = [];
     if (store.statement) {
       store.statement.operations.forEach((o) => {
         if (o.type !== 'FINANCIAL') {
@@ -53,21 +53,21 @@ class Transactions extends React.Component<{store: UserStore} & WithTranslation,
 
     return (
       <div className={s.statement}>
-      {isEmpty && <div className={s.empty}>{this.props.t('Нічого немає 🤷')}</div>}
-      {!store.error && store.selectedCard &&
-        <div className={s.list}>
-          <InfiniteScroll
-            pageStart={0}
-            loadMore={() => this.loadTransactions()}
-            hasMore={!store.statement || !store.statement.isFull}
-            loader={<div className={s.loader} key={0}>{this.props.t('Завантаження…')}</div>}
-            useWindow={false}
-          >
-            {list}
-          </InfiniteScroll>
-        </div>
-      }
-      { store.error && <Error message={store.error} /> }
+        {isEmpty && <div className={s.empty}>{this.props.t('Нічого немає 🤷')}</div>}
+        {!store.error && store.selectedCard &&
+          <div className={s.list}>
+            <InfiniteScroll
+              pageStart={0}
+              loadMore={() => this.loadTransactions()}
+              hasMore={!store.statement || !store.statement.isFull}
+              loader={<div className={s.loader} key={0}>{this.props.t('Завантаження…')}</div>}
+              useWindow={false}
+            >
+              {list}
+            </InfiniteScroll>
+          </div>
+        }
+        { store.error && <Error message={store.error} /> }
       </div>
     );
   }

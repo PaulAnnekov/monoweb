@@ -35,7 +35,7 @@ export interface IOverall {
       phone: string;
       photoAbsoluteUrl: string;
       uid: string;
-    }
+    };
     cards: {
       balance: {
         balance: number;
@@ -43,13 +43,13 @@ export interface IOverall {
         credit: number;
         personal: number;
         usedCreditLimit: number;
-      },
+      };
       cardNum: string;
       currency: string;
       expire: string;
       uid: string;
-    }[]
-  }
+    }[];
+  };
 }
 
 export interface IOperation {
@@ -76,6 +76,6 @@ export interface IOperation {
 export interface IStatement {
   panStatement: {
     full: boolean;
-    listStmt: IOperation[]
-  }
+    listStmt: IOperation[];
+  };
 }

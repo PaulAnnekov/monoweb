@@ -6,7 +6,7 @@ import Transactions from './Transactions';
 import User from './User';
 
 @observer
-export default class extends React.Component<{store: UserStore}, {}> {
+export default class Main extends React.Component<{store: UserStore}, {}> {
   render() {
     const store = this.props.store;
 

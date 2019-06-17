@@ -48,45 +48,45 @@ class Auth extends React.Component<{store: UserStore} & WithTranslation, {phone:
 
     return (
       <div className={s.auth}>
-      { !store.otp &&
-        <form onSubmit={(e) => this.handleSubmit(e)}>
-          <div className={s['phone-wrapper']}>
-            <span className={s.sign}>+</span>
-            <NumberFormat
-              className={s.phone}
-              autoFocus
-              type="tel"
-              defaultValue={state.phone}
-              onValueChange={(v) => this.onPhoneChange(v)}
-              disabled={store.loading}
-              format="### ## ### ####" />
+        { !store.otp &&
+          <form onSubmit={(e) => this.handleSubmit(e)}>
+            <div className={s['phone-wrapper']}>
+              <span className={s.sign}>+</span>
+              <NumberFormat
+                className={s.phone}
+                autoFocus
+                type="tel"
+                defaultValue={state.phone}
+                onValueChange={(v) => this.onPhoneChange(v)}
+                disabled={store.loading}
+                format="### ## ### ####" />
+            </div>
+            { store.error && <Error message={store.error} /> }
+            <button
+              className="form-button"
+              disabled={state.phone.length !== 12 || store.loading}>
+              {this.props.t('Далі')}
+            </button>
+          </form>
+        }
+        { store.otp &&
+          <div className={s['sms-wrapper']}>
+            <div>{this.props.t('Введіть код з СМС')}</div>
+            <div className={s['sms-input']}>
+              <NumberFormat
+                className={s.sms}
+                autoFocus
+                value={store.code}
+                onValueChange={(v) => this.onCodeChange(v)}
+                disabled={store.loading}
+                format="####"
+                size={4} />
+              <input className={s.hint} value={this.hint} size={4} readOnly />
+            </div>
+            { store.error && <Error message={store.error} /> }
           </div>
-          { store.error && <Error message={store.error} /> }
-          <button
-            className="form-button"
-            disabled={state.phone.length !== 12 || store.loading}>
-            {this.props.t('Далі')}
-          </button>
-        </form>
-      }
-      { store.otp &&
-        <div className={s['sms-wrapper']}>
-          <div>{this.props.t('Введіть код з СМС')}</div>
-          <div className={s['sms-input']}>
-            <NumberFormat
-              className={s.sms}
-              autoFocus
-              value={store.code}
-              onValueChange={(v) => this.onCodeChange(v)}
-              disabled={store.loading}
-              format="####"
-              size={4} />
-            <input className={s.hint} value={this.hint} size={4} readOnly />
-          </div>
-          { store.error && <Error message={store.error} /> }
-        </div>
-      }
-      { store.loading && <Loader /> }
+        }
+        { store.loading && <Loader /> }
       </div>
     );
   }

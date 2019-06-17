@@ -1,4 +1,3 @@
-import * as CryptoJS from 'crypto-js';
 import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '../../types';
 import { IToken, ICategory, IKeys, IOverall, IStatement } from './types';
 import { UAParser } from 'ua-parser-js';
@@ -110,7 +109,7 @@ export class PkiAPIError extends APIError {
 
 function getDeviceName(): string {
   // Top browsers in Ukraine according to statcounter.
-  const VENDORS = {
+  const VENDORS: { [index: string]: string } = {
     Chrome: 'Google',
     Firefox: 'Mozilla',
     Safari: 'Apple',
@@ -127,8 +126,15 @@ function getDeviceName(): string {
 }
 
 function getAppVersion(): string {
-    return `${PLATFORM}-${APP_VERSION_CODE}`;
+  return `${PLATFORM}-${APP_VERSION_CODE}`;
 }
+
+interface CardStatementParams {
+  limit?: number;
+  direction?: string;
+  dateFrom?: Date;
+  stmtId?: string;
+};
 
 export default class API {
   private deviceID: string;
@@ -146,35 +152,35 @@ export default class API {
    * Sends OTP request.
    */
   async otp(phone: string): Promise<object> {
-      return this.pkiAPI('otp', {}, {
-          channel: 'sms',
-          phone,
-      });
+    return this.pkiAPI('otp', {}, {
+      channel: 'sms',
+      phone,
+    });
   }
 
   /**
    * Gets restricted access token.
    */
   async token(grant: IGrantTypePassword | IGrantTypeRefreshToken): Promise<IToken> {
-      return this.pkiAPI('token', {}, grant);
+    return this.pkiAPI('token', {}, grant);
   }
 
   /**
    * Gets encryption keys.
    */
   async keys({ access_token }: IToken): Promise<IKeys> {
-      return this.pkiAPI('keys', {Authorization: `Bearer ${access_token}`});
+    return this.pkiAPI('keys', {Authorization: `Bearer ${access_token}`});
   }
 
   /**
    * Gets full permissions access token.
    */
   async auth({ access_token }: IToken, sign: any): Promise<IToken> {
-      return this.pkiAPI('auth', {Authorization: `Bearer ${access_token}`}, {auth: [sign]});
+    return this.pkiAPI('auth', {Authorization: `Bearer ${access_token}`}, {auth: [sign]});
   }
 
   async appOverall({ accessToken }: Token): Promise<IOverall> {
-      return this.mainAPI('app-overall', {Authorization: `Bearer ${accessToken}`});
+    return this.mainAPI('app-overall', {Authorization: `Bearer ${accessToken}`});
   }
 
   async categories({ accessToken }: Token): Promise<ICategory[]> {
@@ -182,9 +188,9 @@ export default class API {
     return res.result.dc;
   }
 
-  async cardStatement({ accessToken }: Token, uid: string, params?: {limit?: number, direction?: string, dateFrom?: Date, stmtId?: string}): Promise<IStatement> {
+  async cardStatement({ accessToken }: Token, uid: string, params?: CardStatementParams): Promise<IStatement> {
     params = params || {};
-    const query = {
+    const query: { [index: string]: any } = {
       v2: false,
       limit: params.limit || 50,
       direction: params.direction,
@@ -203,12 +209,12 @@ export default class API {
     headers.Lang = this.language;
 
     const params: RequestInit = {
-        method: body ? 'POST' : 'GET',
-        headers: new Headers(headers),
-        body: null,
+      method: body ? 'POST' : 'GET',
+      headers: new Headers(headers),
+      body: null,
     };
     if (body) {
-        params.body = JSON.stringify(body);
+      params.body = JSON.stringify(body);
     }
     return this.fetch(url, params);
   }
@@ -223,7 +229,7 @@ export default class API {
       throw new MainAPIError(res ? res.status : null, e);
     }
     if (!res.ok) {
-        throw new MainAPIError(res.status, json);
+      throw new MainAPIError(res.status, json);
     }
     return json;
   }
@@ -238,7 +244,7 @@ export default class API {
       throw new PkiAPIError(res ? res.status : null, e);
     }
     if (!res.ok) {
-        throw new PkiAPIError(res.status, json);
+      throw new PkiAPIError(res.status, json);
     }
     return json;
   }

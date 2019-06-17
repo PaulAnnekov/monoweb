@@ -4,10 +4,12 @@
       "algo",
       "annekov",
       "autorun",
+      "camelcase",
       "decryptor",
       "descr",
       "deserialize",
       "donalds",
+      "eslint",
       "interop",
       "k",
       "maskedinput",
@@ -15,6 +17,7 @@
       "mobx",
       "monobank",
       "monoweb",
+      "multiline",
       "pageview",
       "pavlo",
       "quotemark",
@@ -23,9 +26,11 @@
       "secp",
       "serializable",
       "serializr",
+      "singleline",
       "statcounter",
       "teamthread",
       "types",
+      "typescript",
       "vuex",
       "yandex",
       "аутентифицируетесь",
@@ -40,5 +45,12 @@
     },
     "search.exclude": {
       "dist/**/*": true
-    }
+    },
+    "eslint.enable": true,
+    "eslint.validate": [
+      "javascript",
+      "typescript",
+      "typescriptreact",
+      "javascriptreact"
+    ]
 }

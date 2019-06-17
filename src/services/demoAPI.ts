@@ -1,6 +1,6 @@
 import API, { MainAPIError, PkiAPIError, APIError } from './api';
 import { IToken, IKeys, IOverall, ICategory, IStatement } from './api/types';
-import { IGrantTypeRefreshToken, IGrantTypePassword, Token } from '../types';
+import { IGrantTypeRefreshToken, IGrantTypePassword } from '../types';
 import { t } from './i18n';
 
 export default class DemoAPI extends API {
@@ -26,13 +26,13 @@ export default class DemoAPI extends API {
       });
   }
 
-  async keys({ access_token }: IToken): Promise<IKeys> {
+  async keys(): Promise<IKeys> {
     return this.handle({
       keys: [{name: 'uah', enc_key: btoa('12345678901234567890123456789012')}],
     });
   }
 
-  async auth({ access_token }: IToken, sign: any): Promise<IToken> {
+  async auth(token: IToken, sign: any): Promise<IToken> {
     // When PIN code is '3333'.
     return this.handle(sign.sign === 'zlNeflaDXzmNHjgSq1KOjTX3WQyUi9kRe8Ec54KWru0v/ywYO4CLH+6UN4O6+DXRAFb3VjEyLAr3peOOlbL+1A==' ?
       new PkiAPIError(400, {
@@ -47,7 +47,7 @@ export default class DemoAPI extends API {
       });
   }
 
-  async appOverall({ accessToken }: Token): Promise<IOverall> {
+  async appOverall(): Promise<IOverall> {
     return this.handle({result: {
       personalData: {
         email: 'elon.musk@tesla.com',
@@ -74,7 +74,7 @@ export default class DemoAPI extends API {
     }});
   }
 
-  async categories({ accessToken }: Token): Promise<ICategory[]> {
+  async categories(): Promise<ICategory[]> {
     return this.handle([{
       colorEndItem: '#693ecc',
       colorStartItem: '#5d34ba',
@@ -94,7 +94,7 @@ export default class DemoAPI extends API {
     }]);
   }
 
-  async cardStatement({ accessToken }: Token, uid: string): Promise<IStatement> {
+  async cardStatement(): Promise<IStatement> {
     return this.handle({panStatement: {
       full: true,
       listStmt: [{
