@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../../store';
+import { RootStore } from '../../services/store';
 import * as React from 'react';
 import * as s from './Disclaimer.scss';
 import { withTranslation, WithTranslation, Trans } from 'react-i18next';

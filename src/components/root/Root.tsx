@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { RootStore } from '../../store';
+import { RootStore } from '../../services/store';
 import * as React from 'react';
 import Auth from '../auth/Auth';
 import Pin from '../auth/Pin';

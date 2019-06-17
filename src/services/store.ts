@@ -1,12 +1,12 @@
-import { Token, PersonalData, Card } from './types';
-import API, { MainAPIError, PkiAPIError, APIError } from './services/api';
-import * as crypto from './services/crypto';
+import { Token, PersonalData, Card } from '../types';
+import API, { MainAPIError, PkiAPIError, APIError } from './api';
+import * as crypto from './crypto';
 import {observable, computed, flow, action, autorun} from 'mobx';
-import DemoAPI from './services/demoAPI';
-import { ICategory, IOperation, IToken, IKeys } from './services/api/types';
-import { getLanguage as getBrowserLanguage, genDeviceID, sha1 } from './services/utils';
-import { t } from './services/i18n';
-import config from '../config.json';
+import DemoAPI from './demoAPI';
+import { ICategory, IOperation, IToken, IKeys } from './api/types';
+import { getLanguage as getBrowserLanguage, genDeviceID, sha1 } from './utils';
+import { t } from './i18n';
+import config from '../../config.json';
 import i18next from 'i18next';
 import { create, persist } from 'mobx-persist';
 

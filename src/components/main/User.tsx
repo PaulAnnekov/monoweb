@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { UserStore } from '../../store';
+import { UserStore } from '../../services/store';
 import * as React from 'react';
 import Error from '../common/Error';
 import Loader from '../common/Loader';
