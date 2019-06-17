@@ -1,12 +1,13 @@
 {
-  "name": "Monoweb",
+  "name": "monoweb",
   "version": "0.0.1",
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack",
     "trans": "i18next --config i18next-parser.config.js"
   },
-  "author": "Paul Annekov",
+  "license": "MIT",
+  "author": "Pavlo Annekov",
   "devDependencies": {
     "@types/crypto-js": "3.1.43",
     "@types/elliptic": "6.4.6",

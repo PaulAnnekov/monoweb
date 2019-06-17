@@ -1,9 +1,17 @@
-# Monobank Web
+# Monoweb
 
-- [API findings](https://docs.google.com/document/d/1POr719p4xcl0Y7rdT8Mhi_vZajRK-2tQLOI0k1srzN0)
-- Kali Linux in VM is perfect if you need apktool already configured
-- unpack `apktool d -r com.ftband.mono_2019-03-29.apk`
-- pack
-  - create keystore `keytool -genkey -alias test -keystore test.keystore
-  - pack/sign/install `apktool b . && jarsigner -verbose -keystore test.keystore dist/com.ftband.mono_2019-03-29.apk test && adb install dist/com.ftband.mono_2019-03-29.apk`
-- [make](https://github.com/JesusFreke/smali/wiki/smalidea) .smali-ed app debuggable
+Веб-интерфейс для популярного в Украине мобильного банка [monobank](https://www.monobank.ua/).
+
+## Заметки
+
+### Одна сессия
+
+monobank разрешает только одну одновременную сессию. Как только вы аутентифицируетесь на другом устройстве сессия на текущем устройстве оборвётся. Вам придётся с нуля проходить процесс аутентификации (телефон - SMS код - пин). Это не проблема, но доставляет некоторый дискомфорт, да.
+
+### Множественные запросы SMS кода
+
+Множественные запросы SMS кода в течении короткого промежутка времени, допустим, вход то на смартфоне, то на ПК, в какой-то момент приведут к тому, что коды перестанут приходить. Никакой ошибки вы не увидите. Через несколько часов можно запросить SMS код ещё раз и он должен прийти. Это похоже на какой-то внутренний механизм защиты от подозрительной активности.
+
+### CORS
+
+Так как monobank не предоставляет своего веб-интерфейса, то и [CORS заголовки](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) они не передают. Это исключает возможность напрямую делать запросы к их API из браузера. Данный веб-интерфейс использует [CORS proxy](https://github.com/PaulAnnekov/mighty-lambda-proxy), единственной задачей которого является добавление CORS заголовков в ответ от API.
