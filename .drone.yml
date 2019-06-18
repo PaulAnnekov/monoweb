@@ -1,0 +1,38 @@
+kind: pipeline
+name: default
+
+steps:
+- name: install
+  pull: always
+  image: node:12.4.0-stretch
+  commands:
+  - npm install
+
+- name: lint
+  pull: always
+  image: node:12.4.0-stretch
+  commands:
+  - npm run lint
+
+- name: build
+  pull: always
+  image: node:12.4.0-stretch
+  environment:
+    CONFIG:
+      from_secret: config
+  commands:
+  - echo "$CONFIG" > config.json
+  # Will fail with "TS2307: Cannot find module './[...].scss'", because definition files for .scss are generated too
+  # late.
+  - npm run build || true
+  - npm run build
+
+- name: publish
+  pull: always
+  image: plugins/gh-pages
+  settings:
+    username:
+      from_secret: github_username
+    password:
+      from_secret: github_password
+    pages_directory: dist/
