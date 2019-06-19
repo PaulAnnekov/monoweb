@@ -1,4 +1,5 @@
 # Monoweb
+[![Build Status](https://cloud.drone.io/api/badges/PaulAnnekov/monoweb/status.svg)](https://cloud.drone.io/PaulAnnekov/monoweb)
 
 Веб-интерфейс для популярного в Украине мобильного банка [monobank](https://www.monobank.ua/).
 
