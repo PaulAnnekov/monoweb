@@ -93,7 +93,7 @@
 /*! exports provided: GA_TRACKING_ID, CORS_PROXY, default */
 /***/ (function(module) {
 
-eval("module.exports = {\"GA_TRACKING_ID\":\"UA-41217225-6\",\"CORS_PROXY\":\"https://c0fju5jtm1.execute-api.eu-central-1.amazonaws.com/dev/?url={url}\"};\n\n//# sourceURL=webpack:///./config.json?");
+eval("module.exports = {\"GA_TRACKING_ID\":\"UA-41217225-6\",\"CORS_PROXY\":\"https://z7pgv7pz3b.execute-api.eu-central-1.amazonaws.com/prod?url={url}\"};\n\n//# sourceURL=webpack:///./config.json?");
 
 /***/ }),
 
