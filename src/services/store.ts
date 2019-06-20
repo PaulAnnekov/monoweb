@@ -1,9 +1,9 @@
-import { Token, PersonalData, Card } from '../types';
+import { Token } from '../types';
 import API, { MainAPIError, PkiAPIError, APIError } from './api';
 import * as crypto from './crypto';
 import {observable, computed, flow, action, autorun} from 'mobx';
 import DemoAPI from './demoAPI';
-import { ICategory, IOperation, IToken, IKeys, IOverall } from './api/types';
+import { ICategory, IOperation, IToken, IKeys, IOverall, ICard, IPersonalData } from './api/types';
 import { getLanguage as getBrowserLanguage, genDeviceID, sha1 } from './utils';
 import { t } from './i18n';
 import config from '../../config.json';
@@ -24,8 +24,8 @@ export class UserStore {
   @observable pin = '';
   @observable loading = false;
   @observable error: string | boolean;
-  @observable personalData: PersonalData;
-  @observable cards: Card[];
+  @observable personalData: IPersonalData;
+  @observable cards: ICard[];
   @observable statement: {isFull: boolean; operations: IOperation[]};
   @observable categories: ICategory[];
   @observable selectedCard: string;
@@ -69,9 +69,7 @@ export class UserStore {
     this.error = false;
     try {
       const overall: IOverall = yield this.api.appOverall(this.token as Token);
-      this.cards = overall.result.cards.filter((c) => {
-        return c.state !== 'IDLE';
-      });
+      this.cards = overall.result.cards;
       this.personalData = overall.result.personalData;
     } catch (e) {
       this.processAPIError(e);

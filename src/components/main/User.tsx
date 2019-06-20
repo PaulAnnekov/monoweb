@@ -5,8 +5,9 @@ import Error from '../common/Error';
 import Loader from '../common/Loader';
 import * as s from './User.scss';
 import { moneyFormat, currency } from '../../services/utils';
-import { Card, Language } from '../../types';
+import { Language } from '../../types';
 import { withTranslation, WithTranslation } from 'react-i18next';
+import { ICard } from '../../services/api/types';
 
 @observer
 class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
@@ -14,7 +15,7 @@ class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
     this.props.store.getPersonalData();
   }
 
-  getCardName(card: Card) {
+  getCardName(card: ICard) {
     const names: {[index: string]: string} = {
       '980': this.props.t('Гривнева'),
       '840': this.props.t('Доларова'),
@@ -44,6 +45,9 @@ class User extends React.Component<{store: UserStore} & WithTranslation, {}> {
         {store.cards &&
           <div className={s.cards}>
             {store.cards.map((c) => {
+              if (c.cardState == 12) {
+                return;
+              }
               return (
                 <div
                   className={s['card-info'] + (c.uid === store.selectedCard ? ` ${s.selected}` : '')}

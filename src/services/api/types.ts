@@ -27,31 +27,38 @@ export interface IKeys {
 
 export interface IOverall {
   result: {
-    personalData: {
-      email: string;
-      fullNameRu: string;
-      fullNameUk: string;
-      id: string;
-      phone: string;
-      photoAbsoluteUrl: string;
-      uid: string;
-    };
-    cards: {
-      balance: {
-        balance: number;
-        ccy: string;
-        credit: number;
-        personal: number;
-        usedCreditLimit: number;
-      };
-      cardNum: string;
-      currency: string;
-      expire: string;
-      uid: string;
-      // Looks like when state=IDLE card is not visible in UI.
-      state?: string;
-    }[];
+    personalData: IPersonalData;
+    cards: ICard[];
   };
+}
+
+export interface IPersonalData {
+  email: string;
+  fullNameRu: string;
+  fullNameUk: string;
+  // 10 digits.
+  id: string;
+  phone: string;
+  photoAbsoluteUrl: string;
+  // 32 uppercase alphanumeric characters, same as first card uid.
+  uid: string;
+}
+
+export interface ICard {
+  balance: {
+    balance: number;
+    ccy: string;
+    credit: number;
+    personal: number;
+    usedCreditLimit: number;
+  };
+  cardNum: string;
+  currency: string;
+  expire: string;
+  // 32 uppercase alphanumeric characters.
+  uid: string;
+  // 1 - opened, 4 - blocked, 8 - compromised, 12 - not active, 14 - closed
+  cardState: number;
 }
 
 export interface IOperation {

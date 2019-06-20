@@ -70,6 +70,7 @@ export default class DemoAPI extends API {
         currency: '980',
         expire: '1225',
         uid: '1',
+        cardState: 1,
       }],
     }});
   }
