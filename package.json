@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "webpack",
+    "build": "webpack --mode=production",
     "lint": "eslint --ext .ts --ext .tsx .",
     "trans": "i18next --config i18next-parser.config.js"
   },
