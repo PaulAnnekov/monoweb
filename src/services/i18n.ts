@@ -21,6 +21,9 @@ i18n
     nsSeparator: null,
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
+      if (lng[0] === 'uk') {
+        return;
+      }
       console.warn(`Missing translation key: "${key}"`);
     }
   });
