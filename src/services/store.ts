@@ -3,7 +3,7 @@ import API, { MainAPIError, PkiAPIError, APIError } from './api';
 import * as crypto from './crypto';
 import {observable, computed, flow, action, autorun} from 'mobx';
 import DemoAPI from './demoAPI';
-import { ICategory, IOperation, IToken, IKeys } from './api/types';
+import { ICategory, IOperation, IToken, IKeys, IOverall } from './api/types';
 import { getLanguage as getBrowserLanguage, genDeviceID, sha1 } from './utils';
 import { t } from './i18n';
 import config from '../../config.json';
@@ -68,8 +68,10 @@ export class UserStore {
     this.loading = true;
     this.error = false;
     try {
-      const overall = yield this.api.appOverall(this.token as Token);
-      this.cards = overall.result.cards;
+      const overall: IOverall = yield this.api.appOverall(this.token as Token);
+      this.cards = overall.result.cards.filter((c) => {
+        return c.state !== 'IDLE';
+      });
       this.personalData = overall.result.personalData;
     } catch (e) {
       this.processAPIError(e);

@@ -48,6 +48,8 @@ export interface IOverall {
       currency: string;
       expire: string;
       uid: string;
+      // Looks like when state=IDLE card is not visible in UI.
+      state?: string;
     }[];
   };
 }
