@@ -34,6 +34,8 @@ body {
   width: 100%;
   align-self: flex-end;
   cursor: pointer;
+  // In Safari default top and bottom margin is 2.
+  margin: 0;
 
   &:disabled {
     background-color: #ccc;
