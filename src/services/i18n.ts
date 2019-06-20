@@ -18,12 +18,13 @@ i18n
       escapeValue: false // React already safes from xss.
     },
     keySeparator: '::',
+    nsSeparator: null,
     saveMissing: true,
     missingKeyHandler: (lng, ns, key) => {
       console.warn(`Missing translation key: "${key}"`);
     }
   });
 
-export function t(key: string) {
-  return i18next.t(key) as string;
+export function t(key: string, options?: {[index: string]: string}) {
+  return i18next.t(key, options);
 }
