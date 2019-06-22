@@ -29,8 +29,11 @@ export class Root extends React.Component<{store: RootStore} & WithTranslation, 
 
     return (
       <div className={s.home}>
-        {store.isDemo &&
-          <button className={s['demo-exit']} onClick={() => this.onDemo()}>{this.props.t('Вийти з демо')}</button>}
+        <div className={s.header}>
+          <div className={s.github}><a href="https://github.com/PaulAnnekov/monoweb">GitHub</a></div>
+          {store.isDemo &&
+            <button className={s['demo-exit']} onClick={() => this.onDemo()}>{this.props.t('Вийти з демо')}</button>}
+        </div>
         {auth ? (
           <div className={s['auth-wrapper']}>{auth}</div>
         ) : (

@@ -1,4 +1,5 @@
 .home {
+  position: relative;
   height: 100%;
 
   .auth-wrapper {
@@ -13,19 +14,34 @@
     overflow: hidden;
   }
 
-  .demo-exit {
+  .header {
+    display: flex;
+    align-items: center;
     position: absolute;
-    border: 0;
-    outline: 0;
-    padding: 5px 15px;
-    border-radius: 30px;
     font-size: 80%;
-    background-color: #fa5255;
-    color: #fff;
-    cursor: pointer;
 
-    &:hover {
-      background-color: #cc4345;
+    .github a {
+      color: #fff;
+      text-decoration: none;
+      margin-right: 20px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .demo-exit {
+      border: 0;
+      outline: 0;
+      padding: 5px 15px;
+      border-radius: 30px;
+      background-color: #fa5255;
+      color: #fff;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #cc4345;
+      }
     }
   }
 }
