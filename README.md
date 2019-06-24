@@ -3,7 +3,7 @@
 
 Веб-интерфейс для популярного в Украине мобильного банка [monobank](https://www.monobank.ua/).
 
-![Скриншот](https://user-images.githubusercontent.com/1203892/59969083-40e13700-954e-11e9-8e23-13776301be64.jpg)
+![Превью](https://user-images.githubusercontent.com/1203892/60048747-8419e200-96d5-11e9-96ae-c4f31b4715d8.gif)
 
 ## Описание
 
